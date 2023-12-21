@@ -15,8 +15,6 @@ var (
 	ErrDuplicateEmail  = errors.New("email already used")
 	ErrRepository      = errors.New("error repository")
 	ErrInternalServer  = errors.New("unknown error")
-
-	ErrUserAlreadyMerchant = errors.New("user already as a merchant")
 )
 
 type Auth struct {

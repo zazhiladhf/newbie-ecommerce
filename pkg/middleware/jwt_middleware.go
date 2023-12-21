@@ -50,7 +50,7 @@ func AuthMiddleware() fiber.Handler {
 		claims, err := jwt.ExtractTokenMetadata(c)
 		if err != nil {
 			log.Println("error when try extract token metadata with error", err)
-			return helper.ResponseError(c, helper.ErrRepository)
+			return helper.ResponseError(c, helper.ErrUnauthorized)
 
 		}
 

@@ -8,11 +8,14 @@ import (
 )
 
 var (
-	ErrEmailEmpty      = errors.New("email required")
-	ErrInvalidEmail    = errors.New("invalid email")
-	ErrPasswordEmpty   = errors.New("password required")
-	ErrInvalidPassword = errors.New("invalid password")
-	ErrDuplicateEmail  = errors.New("email already used")
+	ErrEmailEmpty          = errors.New("email required")
+	ErrInvalidEmail        = errors.New("invalid email")
+	ErrPasswordEmpty       = errors.New("password required")
+	ErrInvalidPassword     = errors.New("invalid password")
+	ErrDuplicateEmail      = errors.New("email already used")
+	ErrUserAlreadyMerchant = errors.New("user already as a merchant")
+
+	ErrUnauthorized = errors.New("unauthorized")
 
 	ErrCategoriesNotFound = errors.New("categories not found")
 
@@ -89,6 +92,10 @@ func ResponseError(c *fiber.Ctx, err error) error {
 		return ApiResponse(c, http.StatusConflict, false, "duplicate entry", err.Error(), "40901", nil)
 	case err == ErrCategoriesNotFound:
 		return ApiResponse(c, http.StatusNotFound, false, "category not found", err.Error(), "40401", nil)
+	case err == ErrUserAlreadyMerchant:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40001", nil)
+	case err == ErrUnauthorized:
+		return ApiResponse(c, http.StatusUnauthorized, false, "unauthorized", err.Error(), "40101", nil)
 
 	case err == ErrEmptyName:
 		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40401", nil)

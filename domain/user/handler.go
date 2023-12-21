@@ -90,32 +90,8 @@ func (h AuthHandler) Login(c *fiber.Ctx) error {
 		return helper.ResponseError(c, err)
 	}
 
-	return helper.ResponseSuccess(c, true, "login success", http.StatusOK, helper.Payload{
+	return helper.ResponseSuccess(c, true, "login success", http.StatusOK, Payload{
 		AccessToken: token,
 		Role:        itemAuth.Role,
 	}, nil)
-}
-
-func (h AuthHandler) UpdateRole(c *fiber.Ctx) error {
-	email := c.Locals("email").(string)
-
-	err := h.svc.UpdateRoleToMerchant(c.UserContext(), email)
-	if err != nil {
-		log.Println("error when try to update role with error", err)
-		if err == ErrUserAlreadyMerchant {
-			return helper.ResponseError(c, helper.ErrUserAlreadyMerchant)
-		}
-		pqErr, ok := err.(*pq.Error)
-		if ok {
-			switch pqErr.Code {
-			default:
-				return helper.ResponseError(c, helper.ErrRepository)
-			}
-		} else {
-			log.Println("unknown error with error:", err)
-		}
-		return helper.ResponseError(c, err)
-	}
-
-	return helper.ResponseSuccess(c, true, "update role success", http.StatusOK, nil, nil)
 }

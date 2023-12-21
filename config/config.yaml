@@ -1,5 +1,5 @@
 app:
-  name: "Product Catalog"
+  name: "Newbie Ecommerce"
   port: ":4000"
 
 db:
@@ -7,7 +7,7 @@ db:
   port: "5432"
   user: "postgres"
   password: "74712331"
-  name: "product-catalog"
+  name: "newbie-ecommerce"
 
 redis:
   host: "localhost"
@@ -20,7 +20,7 @@ meili:
   key: "ThisIsMasterKey"
 
 jwt:
-  key: "secretKey"
+  key: "secret"
 
 cloudinary:
   name: "zazhil-cloudinary"

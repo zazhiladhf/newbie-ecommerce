@@ -56,26 +56,3 @@ func (r PostgreSqlxRepository) GetAuthByEmail(ctx context.Context, email string)
 
 	return
 }
-
-func (r PostgreSqlxRepository) UpdateRoleAuth(ctx context.Context, id int) (err error) {
-	query := `
-		UPDATE auths
-		SET role = $1 
-		WHERE id = $2
-	`
-
-	stmt, err := r.db.PreparexContext(ctx, query)
-	if err != nil {
-		return
-	}
-	defer stmt.Close()
-
-	const roleAuth = "merchant"
-
-	_, err = stmt.ExecContext(ctx, roleAuth, id)
-	if err != nil {
-		return
-	}
-
-	return
-}

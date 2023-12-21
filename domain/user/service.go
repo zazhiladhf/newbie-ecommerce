@@ -11,7 +11,6 @@ import (
 type postgreSqlxRepository interface {
 	StoreAuth(ctx context.Context, auth Auth) (err error)
 	GetAuthByEmail(ctx context.Context, email string) (auth Auth, err error)
-	UpdateRoleAuth(ctx context.Context, id int) (err error)
 }
 
 type redisRepository interface {
@@ -87,23 +86,4 @@ func (s AuthService) Login(ctx context.Context, req Auth) (item Auth, token stri
 
 	return itemAuth, token, err
 
-}
-
-func (s AuthService) UpdateRoleToMerchant(ctx context.Context, email string) (err error) {
-	auth, err := s.repo.GetAuthByEmail(ctx, email)
-	if err != nil {
-		log.Println("error when try to getAuthByEmail with error", err)
-		return
-	}
-
-	if auth.Role == "merchant" {
-		return ErrUserAlreadyMerchant
-	}
-
-	err = s.repo.UpdateRoleAuth(ctx, auth.Id)
-	if err != nil {
-		return
-	}
-
-	return
 }
