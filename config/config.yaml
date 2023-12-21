@@ -1,0 +1,28 @@
+app:
+  name: "Product Catalog"
+  port: ":4000"
+
+db:
+  host: "localhost"
+  port: "5432"
+  user: "postgres"
+  password: "74712331"
+  name: "product-catalog"
+
+redis:
+  host: "localhost"
+  port: "6377"
+  password: ""
+  lifeTime: 24
+
+meili:
+  host: "http://localhost:7700"
+  key: "ThisIsMasterKey"
+
+jwt:
+  key: "secretKey"
+
+cloudinary:
+  name: "zazhil-cloudinary"
+  apiKey: "914726226983175"
+  apiSecret: "cPSCFEY3kzElZNlOjXqwtdP8-6M"
