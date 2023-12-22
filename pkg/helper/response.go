@@ -40,6 +40,12 @@ var (
 	ErrDuplicateAuthId    = errors.New("user can't create more profile")
 	ErrUserNotFound       = errors.New("user not found")
 
+	ErrEmptyNameMerchant     = errors.New("name is required")
+	ErrEmptyAddressMerchant  = errors.New("address is required")
+	ErrEmptyImageURLMerchant = errors.New("image_url is required")
+	ErrEmptyCity             = errors.New("city is required")
+	ErrMerchantNotFound      = errors.New("merchant not found")
+
 	ErrRepository     = errors.New("error repository")
 	ErrInternalServer = errors.New("unknown error")
 )
@@ -154,6 +160,17 @@ func ResponseError(c *fiber.Ctx, err error) error {
 	case err == ErrDuplicateAuthId:
 		return ApiResponse(c, http.StatusConflict, false, "duplicate", err.Error(), "40901", nil)
 	case err == ErrUserNotFound:
+		return ApiResponse(c, http.StatusNotFound, false, "not found", err.Error(), "40401", nil)
+
+	case err == ErrEmptyNameMerchant:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40001", nil)
+	case err == ErrEmptyAddressMerchant:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40002", nil)
+	case err == ErrEmptyImageURLMerchant:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40005", nil)
+	case err == ErrEmptyCity:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40006", nil)
+	case err == ErrMerchantNotFound:
 		return ApiResponse(c, http.StatusNotFound, false, "not found", err.Error(), "40401", nil)
 
 	case err == ErrRepository:

@@ -67,11 +67,23 @@ func Migrate(db *sqlx.DB) (err error) {
 			id SERIAL PRIMARY KEY,
 			auth_id int NOT NULL,
 			name VARCHAR(255) NOT NULL,
-			date_of_birth DATE,
-			phone_number VARCHAR(20),
-			gender genders,
-			address VARCHAR(255),
-			image_url VARCHAR(255),
+			date_of_birth DATE NOT NULL,
+			phone_number VARCHAR(20) NOT NULL,
+			gender genders NOT NULL,
+			address VARCHAR(255) NOT NULL,
+			image_url VARCHAR(255) NOT NULL,
+			FOREIGN KEY ("auth_id") REFERENCES "auths" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+			UNIQUE (auth_id)
+		);
+
+		CREATE TABLE IF NOT EXISTS merchants (
+			id SERIAL PRIMARY KEY,
+			auth_id int NOT NULL,
+			name VARCHAR(255) NOT NULL,
+			phone_number VARCHAR(20) NOT NULL,
+			address VARCHAR(255) NOT NULL,
+			image_url VARCHAR(255) NOT NULL,
+			city varchar(100) NOT NULL,
 			FOREIGN KEY ("auth_id") REFERENCES "auths" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
 			UNIQUE (auth_id)
 		);

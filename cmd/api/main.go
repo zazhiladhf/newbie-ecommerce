@@ -9,6 +9,7 @@ import (
 	"github.com/zazhiladhf/newbie-ecommerce/domain/auth"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/category"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/files"
+	"github.com/zazhiladhf/newbie-ecommerce/domain/merchant"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/product"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/user"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/database"
@@ -108,6 +109,7 @@ func main() {
 	product.RegisterRoutesProduct(router, dbSqlx, client)
 	files.RegisterRoutesFile(router, cloudClient, cloudName, apiKey, apiSecret)
 	user.RegisterRoutesUser(router, dbSqlx)
+	merchant.RegisterRoutesMerchant(router, dbSqlx)
 
 	// listen app
 	router.Listen(config.Cfg.App.Port)

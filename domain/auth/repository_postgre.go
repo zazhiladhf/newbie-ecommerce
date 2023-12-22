@@ -70,7 +70,7 @@ func (r PostgreSqlxRepository) UpdateRoleAuth(ctx context.Context, id int) (err 
 	}
 	defer stmt.Close()
 
-	const roleAuth = "merchant"
+	const roleAuth = "Merchant"
 
 	_, err = stmt.ExecContext(ctx, roleAuth, id)
 	if err != nil {
