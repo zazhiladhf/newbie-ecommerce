@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"log"
+	"strconv"
 
 	"github.com/zazhiladhf/newbie-ecommerce/config"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/jwt"
@@ -75,7 +76,8 @@ func (s AuthService) Login(ctx context.Context, req Auth) (item Auth, token stri
 		return req, token, err
 	}
 
-	token, err = jwt.GenerateToken(itemAuth.Email)
+	idString := strconv.Itoa(itemAuth.Id)
+	token, err = jwt.GenerateToken(idString, itemAuth.Email, itemAuth.Role)
 	if err != nil {
 		log.Println("error when trying to generate token with error:", err)
 	}
@@ -96,7 +98,7 @@ func (s AuthService) UpdateRoleToMerchant(ctx context.Context, email string) (er
 		return
 	}
 
-	if auth.Role == "merchant" {
+	if auth.Role == "Merchant" {
 		return ErrUserAlreadyMerchant
 	}
 

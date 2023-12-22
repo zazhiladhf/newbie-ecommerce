@@ -56,14 +56,13 @@ func AuthMiddleware() fiber.Handler {
 
 		// log.Println(&claims)
 
-		// id := claims.Id
+		id := claims.Id
 		email := claims.Email
-		// role := claims.Role
+		role := claims.Role
 
-		// ctx.Locals("id", id)
+		c.Locals("id", id)
 		c.Locals("email", email)
-		// log.Println(email)
-		// ctx.Locals("role", role)
+		c.Locals("role", role)
 
 		return c.Next()
 	}

@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -28,14 +27,18 @@ var secret = []byte("secret")
 
 // TokenMetadata struct to describe metadata in JWT.
 type TokenMetadata struct {
-	Email   string
-	Expires int64
+	Id    string
+	Email string
+	Role  string
+	// Expires int64
 }
 
-func GenerateToken(email string) (string, error) {
+func GenerateToken(id, email, role string) (string, error) {
 	claims := jwt.MapClaims{
+		"id":    id,
 		"email": email,
-		"exp":   jwt.NewNumericDate(time.Now().Add(24 * time.Hour)).Unix(),
+		"role":  role,
+		// "exp":   jwt.NewNumericDate(time.Now().Add(24 * time.Hour)).Unix(),
 	}
 	// claim["user_id"] = email
 
@@ -111,12 +114,15 @@ func ExtractTokenMetadata(c *fiber.Ctx) (*TokenMetadata, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok && token.Valid {
 		// Expires time.
-		expires := int64(claims["exp"].(float64))
+		// expires := int64(claims["exp"].(float64))
+		id := claims["id"].(string)
 		email := claims["email"].(string)
+		role := claims["role"].(string)
 
 		return &TokenMetadata{
-			Expires: expires,
-			Email:   email,
+			Id:    id,
+			Email: email,
+			Role:  role,
 		}, nil
 	}
 

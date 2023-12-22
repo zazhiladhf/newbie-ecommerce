@@ -1,98 +1,102 @@
-package auth
+package user
 
 import (
-	"errors"
-	"net/mail"
+	"strings"
+	"time"
 
-	"golang.org/x/crypto/bcrypt"
+	"github.com/zazhiladhf/newbie-ecommerce/domain/auth"
+	"github.com/zazhiladhf/newbie-ecommerce/pkg/helper"
 )
 
-var (
-	ErrEmailEmpty      = errors.New("email required")
-	ErrInvalidEmail    = errors.New("invalid email")
-	ErrPasswordEmpty   = errors.New("password required")
-	ErrInvalidPassword = errors.New("invalid password")
-	ErrDuplicateEmail  = errors.New("email already used")
-	ErrRepository      = errors.New("error repository")
-	ErrInternalServer  = errors.New("unknown error")
+// Gender type represents the gender of a user.
+type Gender string
+
+const (
+	Male   Gender = "male"
+	Female Gender = "female"
 )
 
-type Auth struct {
-	Id       int    `db:"id"`
-	Email    string `db:"email"`
-	Password string `db:"password"`
-	Role     string `db:"role"`
+type User struct {
+	Id          int    `db:"id"`
+	Name        string `db:"name"`
+	DateOfBirth string `db:"date_of_birth"`
+	PhoneNumber string `db:"phone_number"`
+	Gender      Gender `db:"gender"`
+	Address     string `db:"address"`
+	ImageUrl    string `db:"image_url"`
+	AuthId      int    `db:"auth_id"`
+	Auth        auth.Auth
 }
 
-func NewAuth() Auth {
-	return Auth{}
+func NewUser() User {
+	return User{}
 }
 
-func (a Auth) ValidateFormRegister(req registerRequest) (Auth, error) {
-	if req.Email == "" {
-		return a, ErrEmailEmpty
+func (u User) newFromRequest(req RequestBodyCreateProfileUser) (user User, err error) {
+	user = User{
+		Name:        req.Name,
+		DateOfBirth: req.DateOfBirth,
+		PhoneNumber: req.PhoneNumber,
+		Gender:      Gender(req.Gender),
+		Address:     req.Address,
+		ImageUrl:    req.ImageUrl,
+		AuthId:      user.Auth.Id,
 	}
 
-	if !valid(req.Email) {
-		return a, ErrInvalidEmail
-	}
-
-	if req.Password == "" {
-		return a, ErrPasswordEmpty
-	}
-
-	if len(req.Password) < 6 {
-		return a, ErrInvalidPassword
-	}
-
-	a.Email = req.Email
-	a.Password = req.Password
-	a.Role = "User"
-	return a, nil
-}
-
-func (a Auth) ValidateFormLogin(req loginRequest) (Auth, error) {
-	if req.Email == "" {
-		return a, ErrEmailEmpty
-	}
-
-	if !valid(req.Email) {
-		return a, ErrInvalidEmail
-	}
-
-	if req.Password == "" {
-		return a, ErrPasswordEmpty
-	}
-
-	if len(req.Password) < 6 {
-		return a, ErrInvalidPassword
-	}
-
-	a.Email = req.Email
-	a.Password = req.Password
-	return a, nil
-}
-
-func (a *Auth) EncryptPassword() (err error) {
-	encrypted, err := bcrypt.GenerateFromPassword([]byte(a.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return
-	}
-
-	a.Password = string(encrypted)
+	err = user.ValidateRequestCreateUser()
 	return
 }
 
-func (a Auth) ValidatePassword(password string) (ok bool, err error) {
-	err = bcrypt.CompareHashAndPassword([]byte(a.Password), []byte(password))
-	if err != nil {
-		return ok, err
+func (u User) ValidateRequestCreateUser() (err error) {
+	if u.Gender == "" {
+		return helper.ErrGenderEmpty
 	}
-	ok = true
+
+	if !isValidGender(string(u.Gender)) {
+		return helper.ErrInvalidGender
+	}
+
+	if u.PhoneNumber == "" {
+		return helper.ErrEmptyPhoneNumber
+	}
+
+	if len(u.PhoneNumber) < 10 {
+		return helper.ErrInvalidPhoneNumber
+	}
+
+	if u.Name == "" {
+		return helper.ErrEmptyNameUser
+	}
+
+	if u.Address == "" {
+		return helper.ErrEmptyAddress
+	}
+
+	if u.DateOfBirth == "" {
+		return helper.ErrEmptyDateOfBirth
+	}
+
+	if !isValidDateFormat(u.DateOfBirth) {
+		return helper.ErrInvalidDateOfBirth
+	}
+
+	if u.ImageUrl == "" {
+		return helper.ErrEmptyImageURLUser
+	}
+
+	if err != nil {
+		return helper.ErrUserNotFound
+	}
+
 	return
 }
 
-func valid(email string) bool {
-	_, err := mail.ParseAddress(email)
+func isValidDateFormat(dateString string) bool {
+	_, err := time.Parse("2006-01-02", dateString)
 	return err == nil
+}
+
+func isValidGender(gender string) bool {
+	genderLower := strings.ToLower(gender)
+	return genderLower == "male" || genderLower == "female"
 }

@@ -71,7 +71,7 @@ func (r PostgresSQLXRepository) FindProductByEmail(ctx context.Context, queryPar
 		FROM products as p
 		JOIN categories as c
 			ON c.id = p.category_id
-		WHERE email_auth = $1
+		WHERE p.email_auth = $1
 	`
 
 	queryCountByEmail := `

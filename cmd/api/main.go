@@ -10,6 +10,7 @@ import (
 	"github.com/zazhiladhf/newbie-ecommerce/domain/category"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/files"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/product"
+	"github.com/zazhiladhf/newbie-ecommerce/domain/user"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/database"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/images"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/middleware"
@@ -97,8 +98,7 @@ func main() {
 	log.Println("running db migration")
 	err = database.Migrate(dbSqlx)
 	if err != nil {
-		log.Println("migration failed with error:", err)
-		panic(err)
+		log.Fatal(err)
 	}
 	log.Println("migration done")
 
@@ -107,6 +107,7 @@ func main() {
 	category.RegisterRoutesCategory(router, dbSqlx)
 	product.RegisterRoutesProduct(router, dbSqlx, client)
 	files.RegisterRoutesFile(router, cloudClient, cloudName, apiKey, apiSecret)
+	user.RegisterRoutesUser(router, dbSqlx)
 
 	// listen app
 	router.Listen(config.Cfg.App.Port)

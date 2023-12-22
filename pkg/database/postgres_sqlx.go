@@ -61,8 +61,25 @@ func Migrate(db *sqlx.DB) (err error) {
 			email_auth varchar(100),
 			FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 		);
+
+
+		CREATE TABLE IF NOT EXISTS users (
+			id SERIAL PRIMARY KEY,
+			auth_id int NOT NULL,
+			name VARCHAR(255) NOT NULL,
+			date_of_birth DATE,
+			phone_number VARCHAR(20),
+			gender genders,
+			address VARCHAR(255),
+			image_url VARCHAR(255),
+			FOREIGN KEY ("auth_id") REFERENCES "auths" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+			UNIQUE (auth_id)
+		);
+
 	`
 	_, err = db.Exec(query)
 
 	return
 }
+
+// CREATE TYPE gender AS ENUM ('male', 'female');

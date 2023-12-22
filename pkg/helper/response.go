@@ -15,9 +15,9 @@ var (
 	ErrDuplicateEmail      = errors.New("email already used")
 	ErrUserAlreadyMerchant = errors.New("user already as a merchant")
 
-	ErrUnauthorized = errors.New("unauthorized")
-
 	ErrCategoriesNotFound = errors.New("categories not found")
+
+	ErrUnauthorized = errors.New("unauthorized")
 
 	ErrEmptyName       = errors.New("name is required")
 	ErrEmptyImageURL   = errors.New("image_url is required")
@@ -25,6 +25,20 @@ var (
 	ErrEmptyPrice      = errors.New("price is required")
 	ErrEmptyCategoryId = errors.New("category_id is required")
 	ErrNotFound        = errors.New("product not found")
+
+	ErrGenderEmpty        = errors.New("gender is required")
+	ErrInvalidGender      = errors.New("gender is invalid")
+	ErrEmptyPhoneNumber   = errors.New("phone_number is empty")
+	ErrInvalidPhoneNumber = errors.New("phone_number length must be greater than equal 10")
+	ErrEmptyNameUser      = errors.New("name is required")
+	ErrEmptyAddress       = errors.New("address is required")
+	ErrEmptyDateOfBirth   = errors.New("date_of_birth is required")
+	ErrInvalidDateOfBirth = errors.New("date_of_birth is invalid")
+	ErrEmptyImageURLUser  = errors.New("image_url is required")
+	ErrUnauthorizedUser   = errors.New("please provide jwt token")
+	ErrInvalidRole        = errors.New("invalid role")
+	ErrDuplicateAuthId    = errors.New("user can't create more profile")
+	ErrUserNotFound       = errors.New("user not found")
 
 	ErrRepository     = errors.New("error repository")
 	ErrInternalServer = errors.New("unknown error")
@@ -90,10 +104,12 @@ func ResponseError(c *fiber.Ctx, err error) error {
 		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40004", nil)
 	case err == ErrDuplicateEmail:
 		return ApiResponse(c, http.StatusConflict, false, "duplicate entry", err.Error(), "40901", nil)
-	case err == ErrCategoriesNotFound:
-		return ApiResponse(c, http.StatusNotFound, false, "category not found", err.Error(), "40401", nil)
 	case err == ErrUserAlreadyMerchant:
 		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40001", nil)
+
+	case err == ErrCategoriesNotFound:
+		return ApiResponse(c, http.StatusNotFound, false, "category not found", err.Error(), "40401", nil)
+
 	case err == ErrUnauthorized:
 		return ApiResponse(c, http.StatusUnauthorized, false, "unauthorized", err.Error(), "40101", nil)
 
@@ -109,6 +125,36 @@ func ResponseError(c *fiber.Ctx, err error) error {
 		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40405", nil)
 	case err == ErrNotFound:
 		return ApiResponse(c, http.StatusNotFound, false, "category not found", err.Error(), "40401", nil)
+
+	case err == ErrDuplicateAuthId:
+		return ApiResponse(c, http.StatusConflict, false, "duplicate entry", err.Error(), "40901", nil)
+
+	case err == ErrGenderEmpty:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40001", nil)
+	case err == ErrInvalidGender:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40002", nil)
+	case err == ErrEmptyPhoneNumber:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40003", nil)
+	case err == ErrInvalidPhoneNumber:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40004", nil)
+	case err == ErrEmptyNameUser:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40005", nil)
+	case err == ErrEmptyAddress:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40006", nil)
+	case err == ErrEmptyDateOfBirth:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40007", nil)
+	case err == ErrInvalidDateOfBirth:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40008", nil)
+	case err == ErrEmptyImageURLUser:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40009", nil)
+	case err == ErrUnauthorizedUser:
+		return ApiResponse(c, http.StatusUnauthorized, false, "unauthorized", err.Error(), "40101", nil)
+	case err == ErrInvalidRole:
+		return ApiResponse(c, http.StatusUnauthorized, false, "unauthorized", err.Error(), "40102", nil)
+	case err == ErrDuplicateAuthId:
+		return ApiResponse(c, http.StatusConflict, false, "duplicate", err.Error(), "40901", nil)
+	case err == ErrUserNotFound:
+		return ApiResponse(c, http.StatusNotFound, false, "not found", err.Error(), "40000", nil)
 
 	case err == ErrRepository:
 		return ApiResponse(c, http.StatusInternalServerError, false, "error repository", err.Error(), "50001", nil)

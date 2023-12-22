@@ -1,4 +1,4 @@
-package auth
+package user
 
 import (
 	"context"
@@ -17,12 +17,12 @@ func NewPostgreSqlxRepository(db *sqlx.DB) PostgreSqlxRepository {
 	}
 }
 
-func (r PostgreSqlxRepository) StoreAuth(ctx context.Context, auth Auth) (err error) {
+func (r PostgreSqlxRepository) InsertUser(ctx context.Context, user User) (err error) {
 	query := `
-		INSERT INTO auths (
-			email, password, role
+		INSERT INTO users (
+			name, auth_id, date_of_birth, phone_number, gender, address, image_url
 		) VALUES (
-			:email, :password, :role
+			:name, :auth_id, :date_of_birth, :phone_number, :gender, :address, :image_url
 		)
 	`
 
@@ -32,7 +32,7 @@ func (r PostgreSqlxRepository) StoreAuth(ctx context.Context, auth Auth) (err er
 	}
 	defer stmt.Close()
 
-	_, err = stmt.ExecContext(ctx, auth)
+	_, err = stmt.ExecContext(ctx, user)
 	if err != nil {
 		return
 	}
@@ -40,17 +40,20 @@ func (r PostgreSqlxRepository) StoreAuth(ctx context.Context, auth Auth) (err er
 	return
 }
 
-func (r PostgreSqlxRepository) GetAuthByEmail(ctx context.Context, email string) (auth Auth, err error) {
+func (r PostgreSqlxRepository) GetUserById(ctx context.Context, id int) (user User, err error) {
 	query := `
-		SELECT id, email, password, role 
-		FROM auths 
-		WHERE email = $1
+		SELECT 
+			u.id, u.name, u.date_of_birth, u.phone_number, u.gender, u.address, u.image_url, a.role
+		FROM users as u
+		JOIN auths as a
+			ON a.id = u.auth_id
+		WHERE u_id = $1
 	`
 
-	err = r.db.GetContext(ctx, &auth, query, email)
+	err = r.db.GetContext(ctx, &user, query, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return Auth{}, nil
+			return User{}, nil
 		}
 	}
 
