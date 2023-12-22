@@ -104,6 +104,7 @@ func (s AuthService) UpdateRoleToMerchant(ctx context.Context, email string) (er
 
 	err = s.repo.UpdateRoleAuth(ctx, auth.Id)
 	if err != nil {
+		log.Println("error when try to update role auth with error", err)
 		return
 	}
 

@@ -11,6 +11,7 @@ import (
 type postgreSqlxRepository interface {
 	InsertUser(ctx context.Context, user User) (err error)
 	GetUserById(ctx context.Context, id int) (user User, err error)
+	UpdateUser(ctx context.Context, req User) (err error)
 }
 
 type authRepository interface {
@@ -18,13 +19,13 @@ type authRepository interface {
 }
 
 type UserService struct {
-	repo     postgreSqlxRepository
+	userRepo postgreSqlxRepository
 	authRepo authRepository
 }
 
-func NewService(repo postgreSqlxRepository, authrepo authRepository) UserService {
+func NewService(userRepo postgreSqlxRepository, authrepo authRepository) UserService {
 	return UserService{
-		repo:     repo,
+		userRepo: userRepo,
 		authRepo: authrepo,
 	}
 }
@@ -51,7 +52,7 @@ func (s UserService) CreateProfileUser(ctx context.Context, req User, email stri
 	// 	return user, ErrUnauthorized
 	// }
 
-	err = s.repo.InsertUser(ctx, req)
+	err = s.userRepo.InsertUser(ctx, req)
 	if err != nil {
 		log.Println("error when try to insert user to db with error", err)
 		return
@@ -61,9 +62,9 @@ func (s UserService) CreateProfileUser(ctx context.Context, req User, email stri
 }
 
 func (s UserService) GetUserById(ctx context.Context, id int) (resp GetUserResponse, err error) {
-	user, err := s.repo.GetUserById(ctx, id)
+	user, err := s.userRepo.GetUserById(ctx, id)
 	if err != nil {
-		log.Println("user:", err)
+		log.Println("error when try to get user by id with error", err)
 		return
 	}
 
@@ -72,6 +73,37 @@ func (s UserService) GetUserById(ctx context.Context, id int) (resp GetUserRespo
 	}
 
 	resp = NewUser().UserResponse(user)
+
+	return
+}
+
+func (s UserService) UpdateProfileUser(ctx context.Context, req User, email string) (err error) {
+	auth, err := s.authRepo.GetAuthByEmail(ctx, email)
+	if err != nil {
+		log.Println("error when try to get auth by email with error", err)
+		return
+	}
+
+	if auth.Role != "User" {
+		log.Println("auth:", auth)
+		return helper.ErrInvalidRole
+	}
+
+	// user, err := s.repo.GetUserById(ctx, req.AuthId)
+	// if err != nil {
+	// 	log.Println("error when try to get user by id with error", err)
+	// 	return
+	// }
+
+	// if user.Id == 0 {
+	// 	return helper.ErrUserNotFound
+	// }
+
+	err = s.userRepo.UpdateUser(ctx, req)
+	if err != nil {
+		log.Println("error when try to update user with error", err)
+		return
+	}
 
 	return
 }

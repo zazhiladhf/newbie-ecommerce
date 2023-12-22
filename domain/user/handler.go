@@ -34,7 +34,7 @@ func (h UserHandler) CreateProfile(c *fiber.Ctx) (err error) {
 
 	user, err := NewUser().newFromRequest(req)
 	if err != nil {
-		log.Println("error when try to validate form register with error", err)
+		log.Println("error when try to validate request body with error", err)
 		return helper.ResponseError(c, err)
 	}
 	user.AuthId = idInt
@@ -60,13 +60,13 @@ func (h UserHandler) CreateProfile(c *fiber.Ctx) (err error) {
 	return helper.ResponseSuccess(c, true, "registration success", http.StatusCreated, nil, nil)
 }
 
-func (h UserHandler) GetProfile(c *fiber.Ctx) error {
+func (h UserHandler) GetProfile(c *fiber.Ctx) (err error) {
 	id := c.Locals("id").(string)
 	idInt, _ := strconv.Atoi(id)
 
 	user, err := h.svc.GetUserById(c.UserContext(), idInt)
 	if err != nil {
-		log.Println("error when try to get user by token with error", err)
+		log.Println("error when try to get user by token (id) with error", err)
 		pqErr, ok := err.(*pq.Error)
 		if ok {
 			switch pqErr.Code {
@@ -80,4 +80,42 @@ func (h UserHandler) GetProfile(c *fiber.Ctx) error {
 	}
 
 	return helper.ResponseSuccess(c, true, "get user success", http.StatusOK, user, nil)
+}
+
+func (h UserHandler) UpdateProfile(c *fiber.Ctx) (err error) {
+	var req RequestBodyCreateProfileUser
+	email := c.Locals("email").(string)
+	id := c.Locals("id").(string)
+	idInt, _ := strconv.Atoi(id)
+
+	err = c.BodyParser(&req)
+	if err != nil {
+		log.Println("error when try to parsing body request with error", err)
+		return helper.ResponseError(c, err)
+	}
+
+	user, err := NewUser().newFromRequest(req)
+	if err != nil {
+		log.Println("error when try to validate request body with error", err)
+		return helper.ResponseError(c, err)
+	}
+	user.AuthId = idInt
+	log.Println("user request:", user)
+
+	err = h.svc.UpdateProfileUser(c.UserContext(), user, email)
+	if err != nil {
+		log.Println("error when try to update profile user with error", err)
+		pqErr, ok := err.(*pq.Error)
+		if ok {
+			switch pqErr.Code {
+			default:
+				return helper.ResponseError(c, helper.ErrRepository)
+			}
+		} else {
+			log.Println("unknown error with error:", err)
+		}
+		return helper.ResponseError(c, err)
+	}
+
+	return helper.ResponseSuccess(c, true, "update user success", http.StatusOK, nil, nil)
 }

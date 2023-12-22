@@ -18,5 +18,6 @@ func RegisterRoutesUser(router fiber.Router, db *sqlx.DB) {
 	{
 		userRouter.Post("/profile", middleware.AuthMiddleware(), handler.CreateProfile)
 		userRouter.Get("/profile", middleware.AuthMiddleware(), handler.GetProfile)
+		userRouter.Put("/profile", middleware.AuthMiddleware(), handler.UpdateProfile)
 	}
 }

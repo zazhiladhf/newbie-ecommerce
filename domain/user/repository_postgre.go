@@ -57,3 +57,19 @@ func (r PostgreSqlxRepository) GetUserById(ctx context.Context, id int) (user Us
 
 	return
 }
+
+func (r PostgreSqlxRepository) UpdateUser(ctx context.Context, req User) (err error) {
+	query := `
+		UPDATE users
+		SET name = :name, date_of_birth = :date_of_birth, phone_number = :phone_number,
+			gender = :gender, address = :address, image_url = :image_url
+		WHERE id = :auth_id
+	`
+
+	_, err = r.db.NamedExecContext(ctx, query, req)
+	if err != nil {
+		return
+	}
+
+	return
+}
