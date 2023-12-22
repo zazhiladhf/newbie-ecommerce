@@ -100,3 +100,16 @@ func isValidGender(gender string) bool {
 	genderLower := strings.ToLower(gender)
 	return genderLower == "male" || genderLower == "female"
 }
+
+func (u User) UserResponse(user User) GetUserResponse {
+	resp := GetUserResponse{
+		Name:        user.Name,
+		DateOfBirth: user.DateOfBirth,
+		PhoneNumber: user.PhoneNumber,
+		Gender:      string(user.Gender),
+		Address:     user.Address,
+		ImageUrl:    user.ImageUrl,
+	}
+
+	return resp
+}

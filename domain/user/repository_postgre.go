@@ -43,11 +43,9 @@ func (r PostgreSqlxRepository) InsertUser(ctx context.Context, user User) (err e
 func (r PostgreSqlxRepository) GetUserById(ctx context.Context, id int) (user User, err error) {
 	query := `
 		SELECT 
-			u.id, u.name, u.date_of_birth, u.phone_number, u.gender, u.address, u.image_url, a.role
-		FROM users as u
-		JOIN auths as a
-			ON a.id = u.auth_id
-		WHERE u_id = $1
+			id, name, date_of_birth, phone_number, gender, address, image_url, auth_id
+		FROM users
+		WHERE id = $1
 	`
 
 	err = r.db.GetContext(ctx, &user, query, id)

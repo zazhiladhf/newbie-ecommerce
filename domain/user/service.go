@@ -60,38 +60,18 @@ func (s UserService) CreateProfileUser(ctx context.Context, req User, email stri
 	return
 }
 
-// func (s UserService) Login(ctx context.Context, req Auth) (item Auth, token string, err error) {
-// 	itemAuth, err := s.repo.GetAuthByEmail(ctx, req.Email)
-// 	if err != nil {
-// 		log.Println("error when try to getAuthByEmail with error", err)
-// 		return
-// 	}
+func (s UserService) GetUserById(ctx context.Context, id int) (resp GetUserResponse, err error) {
+	user, err := s.repo.GetUserById(ctx, id)
+	if err != nil {
+		log.Println("user:", err)
+		return
+	}
 
-// 	if itemAuth.Email != req.Email {
-// 		return item, token, ErrInvalidEmail
-// 	}
+	if user.Id == 0 {
+		return resp, helper.ErrUserNotFound
+	}
 
-// 	ok, err := itemAuth.ValidatePassword(req.Password)
-// 	if err != nil {
-// 		log.Println("error when try to validate password with error", err)
-// 		return req, token, err
-// 	}
+	resp = NewUser().UserResponse(user)
 
-// 	if !ok {
-// 		log.Println("error when try to !ok with error", err)
-// 		return req, token, err
-// 	}
-
-// 	token, err = jwt.GenerateToken(itemAuth.Email)
-// 	if err != nil {
-// 		log.Println("error when trying to generate token with error:", err)
-// 	}
-
-// 	err = s.redis.Set(ctx, itemAuth.Email, token, config.Cfg.Redis.LifeTime)
-// 	if err != nil {
-// 		log.Println("error when try to set data to redis with message :", err)
-// 	}
-
-// 	return itemAuth, token, err
-
-// }
+	return
+}

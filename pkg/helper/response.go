@@ -154,7 +154,7 @@ func ResponseError(c *fiber.Ctx, err error) error {
 	case err == ErrDuplicateAuthId:
 		return ApiResponse(c, http.StatusConflict, false, "duplicate", err.Error(), "40901", nil)
 	case err == ErrUserNotFound:
-		return ApiResponse(c, http.StatusNotFound, false, "not found", err.Error(), "40000", nil)
+		return ApiResponse(c, http.StatusNotFound, false, "not found", err.Error(), "40401", nil)
 
 	case err == ErrRepository:
 		return ApiResponse(c, http.StatusInternalServerError, false, "error repository", err.Error(), "50001", nil)

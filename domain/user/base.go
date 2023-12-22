@@ -17,6 +17,6 @@ func RegisterRoutesUser(router fiber.Router, db *sqlx.DB) {
 	userRouter := router.Group("/v1/users")
 	{
 		userRouter.Post("/profile", middleware.AuthMiddleware(), handler.CreateProfile)
-		// userRouter.Post("/login", handler.Login)
+		userRouter.Get("/profile", middleware.AuthMiddleware(), handler.GetProfile)
 	}
 }
