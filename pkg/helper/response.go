@@ -207,8 +207,8 @@ type Pagination struct {
 func NewPaginationResponse(queryParam string, limit, page, totalData int) Pagination {
 	return Pagination{
 		Query: queryParam,
-		// Limit:     limit,
-		// Page:      page,
+		Limit: limit,
+		Page:  page,
 		Total: CountTotalPage(totalData, limit),
 	}
 }

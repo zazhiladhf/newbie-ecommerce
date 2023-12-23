@@ -63,20 +63,20 @@ func (h ProductHandler) GetListProducts(c *fiber.Ctx) error {
 	email := c.Locals("email").(string)
 
 	limit := c.Query("limit", "10")
-	limitValue, err := strconv.Atoi(limit)
+	limitInt, err := strconv.Atoi(limit)
 	if err != nil {
 		log.Println("error when try convert limit to int with error", err)
 		return helper.ResponseError(c, err)
 	}
 
 	page := c.Query("page", "1")
-	pageValue, err := strconv.Atoi(page)
+	pageInt, err := strconv.Atoi(page)
 	if err != nil {
 		log.Println("error when try to convert page to int with error", err)
 		return helper.ResponseError(c, err)
 	}
 
-	resp, totalData, err := h.svc.GetListProductsMerchant(c.UserContext(), queryParam, email, limitValue, pageValue)
+	resp, totalData, err := h.svc.GetListProductsMerchant(c.UserContext(), queryParam, email, limitInt, pageInt)
 	if err != nil {
 		log.Println("error when try to get products by token with error", err)
 		pqErr, ok := err.(*pq.Error)
@@ -94,7 +94,7 @@ func (h ProductHandler) GetListProducts(c *fiber.Ctx) error {
 	log.Println("list products:", resp)
 
 	if totalData != 0 {
-		pagination := helper.NewPaginationResponse(queryParam, limitValue, pageValue, totalData)
+		pagination := helper.NewPaginationResponse(queryParam, limitInt, pageInt, totalData)
 		return helper.ResponseSuccess(c, true, "get products success", http.StatusOK, resp, pagination)
 	}
 

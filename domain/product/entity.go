@@ -21,7 +21,7 @@ type Product struct {
 	UpdatedAt    string `db:"updated_at"`
 	MerchantName string `db:"merchant_name"`
 	MerchantCity string `db:"merchant_city"`
-	// TotalData    int     `db:"total_data"`
+	TotalData    int    `db:"total_data"`
 }
 
 func NewProduct() Product {
@@ -88,12 +88,14 @@ func (p Product) ProductResponse(products []Product) []GetListProductResponse {
 
 	for _, product := range products {
 		response := GetListProductResponse{
-			Id:       product.Id,
-			Name:     product.Name,
-			Price:    product.Price,
-			Stock:    product.Stock,
-			Category: product.Category,
-			ImageURL: product.ImageURL,
+			Id:          product.Id,
+			Sku:         product.Sku,
+			Name:        product.Name,
+			Description: product.Description,
+			Price:       product.Price,
+			Stock:       product.Stock,
+			Category:    product.Category,
+			ImageURL:    product.ImageURL,
 		}
 
 		resp = append(resp, response)
