@@ -19,8 +19,6 @@ type ProductRepository interface {
 
 type SearchEngineInterface interface {
 	SyncPartial(ctx context.Context, productList []Product) (statusId int, err error)
-	// SyncAll(ctx context.Context, productList []Product) (statusId int, err error)
-	// GetAll(ctx context.Context) (productList []Product, err error)
 }
 
 type AuthRepository interface {

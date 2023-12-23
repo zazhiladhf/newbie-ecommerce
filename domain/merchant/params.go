@@ -15,3 +15,9 @@ type GetMerchantResponse struct {
 	ImageUrl    string `json:"image_url"`
 	City        string `json:"city"`
 }
+
+type MerchantResponse struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+	City string `json:"city"`
+}

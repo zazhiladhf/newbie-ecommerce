@@ -132,7 +132,7 @@ func (p Product) ProductDetailUserPerspectiveResponse(product Product) GetDetail
 		Stock:       product.Stock,
 		Category:    product.Category,
 		CategoryId:  product.CategoryId,
-		Merchant: merchant.Merchant{
+		Merchant: merchant.MerchantResponse{
 			Id:   product.MerchantId,
 			Name: product.MerchantName,
 			City: product.MerchantCity,
