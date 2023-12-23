@@ -140,14 +140,6 @@ func (s Service) UpdateProduct(ctx context.Context, req Product, email string) (
 		return helper.ErrNotFound
 	}
 
-	// _, err = s.categoryRepository.GetById(ctx, req.CategoryId)
-	// if err != nil {
-	// 	if sql.ErrNoRows == err {
-	// 		err = helper.ErrCategoriesNotFound
-	// 	}
-	// 	return
-	// }
-
 	err = s.pRepo.UpdateProduct(ctx, req)
 	if err != nil {
 		log.Println("error when try to update product with error", err)

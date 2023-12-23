@@ -12,7 +12,6 @@ func RegisterRoutesProduct(router fiber.Router, dbSqlx *sqlx.DB, client *meilise
 	meiliRepo := NewMeiliRepository(client)
 	// authRepo := auth.NewPostgreSqlxRepository(dbSqlx)
 	// redis := auth.NewRedisRepository(&redis.Client{})
-	// authService := auth.NewService(authRepo, redis)
 	productRepo := NewPostgresSQLXRepository(dbSqlx)
 	authRepo := auth.NewPostgreSqlxRepository(dbSqlx)
 

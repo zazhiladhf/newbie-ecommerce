@@ -116,7 +116,7 @@ func (p Product) ProductDetailResponse(product Product) GetDetailProductResponse
 		CategoryId:  product.CategoryId,
 		ImageURL:    product.ImageURL,
 		CreatedAt:   product.CreatedAt,
-		UpdatedAt:   p.UpdatedAt,
+		UpdatedAt:   product.UpdatedAt,
 	}
 
 	return response

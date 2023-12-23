@@ -125,7 +125,6 @@ func (h ProductHandler) GetDetailProduct(c *fiber.Ctx) error {
 func (h ProductHandler) UpdateProduct(c *fiber.Ctx) error {
 	var req CreateProductRequest
 	email := c.Locals("email").(string)
-	// id := c.Locals("id").(string)
 	productId := c.Params("product_id")
 
 	productIdInt, err := strconv.Atoi(productId)
@@ -149,7 +148,7 @@ func (h ProductHandler) UpdateProduct(c *fiber.Ctx) error {
 
 	err = h.svc.UpdateProduct(c.UserContext(), product, email)
 	if err != nil {
-		log.Println("error when try to update product by token merchant with error", err)
+		log.Println("error when try to update product with error", err)
 		pqErr, ok := err.(*pq.Error)
 		if ok {
 			switch pqErr.Code {
@@ -163,7 +162,7 @@ func (h ProductHandler) UpdateProduct(c *fiber.Ctx) error {
 		return helper.ResponseError(c, err)
 	}
 
-	return helper.ResponseSuccess(c, true, "update product success", fiber.StatusOK, nil, nil)
+	return helper.ResponseSuccess(c, true, "update product success", http.StatusOK, nil, nil)
 }
 
 func (h ProductHandler) GetDetailProductUserPerspective(c *fiber.Ctx) error {
