@@ -2,13 +2,19 @@ package product
 
 import (
 	"context"
+	"database/sql"
 	"log"
+
+	"github.com/zazhiladhf/newbie-ecommerce/domain/auth"
+	"github.com/zazhiladhf/newbie-ecommerce/pkg/helper"
 )
 
 type ProductRepository interface {
-	InsertProduct(ctx context.Context, model Product) (id int, err error)
-	// FindAllProducts(ctx context.Context) (list []Product, err error)
-	FindProductByEmail(ctx context.Context, queryParam string, email string, limit int, page int) (list []Product, totalData int, err error)
+	InsertProduct(ctx context.Context, product Product) (id int, err error)
+	GetProducts(ctx context.Context, queryParam string, id int, limit int, page int) (list []Product, totalData int, err error)
+	GetProductById(ctx context.Context, id int) (product Product, err error)
+	UpdateProduct(ctx context.Context, product Product) (err error)
+	GetProductBySku(ctx context.Context, sku string) (product Product, err error)
 }
 
 type SearchEngineInterface interface {
@@ -17,57 +23,41 @@ type SearchEngineInterface interface {
 	// GetAll(ctx context.Context) (productList []Product, err error)
 }
 
-// type AuthRepository interface {
-// 	GetAuthByEmail(ctx context.Context, email string) (auth auth.Auth, err error)
-// }
+type AuthRepository interface {
+	GetAuthByEmail(ctx context.Context, email string) (auth auth.Auth, err error)
+}
 
 type Service struct {
-	repo   ProductRepository
+	pRepo  ProductRepository
+	aRepo  AuthRepository
 	search SearchEngineInterface
 	// authRepo    AuthRepository
 }
 
-func NewService(repo ProductRepository, search SearchEngineInterface) Service {
+func NewService(pRepo ProductRepository, aRepo AuthRepository, search SearchEngineInterface) Service {
 	return Service{
-		repo:   repo,
+		pRepo:  pRepo,
+		aRepo:  aRepo,
 		search: search,
-		// authRepo:    authRepo,
 	}
 }
 
-func (s Service) createProduct(ctx context.Context, req Product) (err error) {
-	// product, err := newFromRequest(req)
-	// if err != nil {
-	// 	return
-	// }
-	// product.AuthEmail = token
+func (s Service) CreateProductByMerchant(ctx context.Context, req Product, email string) (err error) {
+	auth, err := s.aRepo.GetAuthByEmail(ctx, email)
+	if err != nil {
+		log.Println("error when try to get auth by email with error", err)
+		return
+	}
 
-	// if err = req.(); err != nil {
-	// 	log.Println("erro when try to validate request with error")
-	// 	return
-	// }GetAuthByEmail
+	if auth.Role != "Merchant" {
+		return helper.ErrInvalidRole
+	}
 
-	// auth, err := s.authRepo.GetAuthByEmail(ctx, token)
-	// if err != nil {
-	// 	log.Println("error when try to get auth by email with error :", err.Error(), token)
-	// 	return err
-	// }
-
-	// model := Product{
-	// 	Name:       product.Name,
-	// 	Stock:      product.Stock,
-	// 	Price:      product.Price,
-	// 	CategoryId: product.CategoryId,
-	// 	ImageURL:   product.ImageURL,
-	// 	AuthEmail:  auth.Email,
-	// }
-
-	id, err := s.repo.InsertProduct(ctx, req)
+	id, err := s.pRepo.InsertProduct(ctx, req)
 	if err != nil {
 		log.Println("error when try to insert product to database with error :", err.Error())
 		return err
 	}
-
 	req.Id = id
 
 	status, err := s.search.SyncPartial(ctx, []Product{req})
@@ -81,21 +71,18 @@ func (s Service) createProduct(ctx context.Context, req Product) (err error) {
 	return
 }
 
-// func (s Service) GetProducts(ctx context.Context) (list []Product, err error) {
-// 	listProducts, err := s.repo.FindAll(ctx)
-// 	if err != nil {
-// 		if err == ErrCategoriesNotFound {
-// 			return []Product{}, nil
-// 		}
-// 		return nil, err
-// 	}
+func (s Service) GetListProductsMerchant(ctx context.Context, queryParam string, email string, limit int, page int) (resp []GetListProductResponse, totalData int, err error) {
+	auth, err := s.aRepo.GetAuthByEmail(ctx, email)
+	if err != nil {
+		log.Println("error when try to get auth by email with error", err)
+		return
+	}
 
-// 	return listProducts, nil
+	if auth.Role != "Merchant" {
+		return nil, 0, helper.ErrInvalidRole
+	}
 
-// }
-
-func (s Service) GetProductsByEmail(ctx context.Context, queryParam string, email string, limit int, page int) (resp []GetListProductResponse, totalData int, err error) {
-	list, totalData, err := s.repo.FindProductByEmail(ctx, queryParam, email, limit, page)
+	list, totalData, err := s.pRepo.GetProducts(ctx, queryParam, auth.Id, limit, page)
 	if err != nil {
 		return
 	}
@@ -105,25 +92,81 @@ func (s Service) GetProductsByEmail(ctx context.Context, queryParam string, emai
 	return
 }
 
-// func (s Service) UpdateProduct(ctx context.Context, req Product, param int) (err error) {
-// 	if err = req.Validate(); err != nil {
-// 		log.Println("erro when try to validate request with error")
-// 		return
-// 	}
+func (s Service) GetDetailProductById(ctx context.Context, id int, email string) (resp GetDetailProductResponse, err error) {
+	auth, err := s.aRepo.GetAuthByEmail(ctx, email)
+	if err != nil {
+		log.Println("error when try to get auth by email with error", err)
+		return
+	}
 
-// 	if err = s.repo.Update(ctx, param, req); err != nil {
-// 		log.Println("error when try to Update to database with error :", err.Error())
-// 		return
-// 	}
-// 	return
+	if auth.Role != "Merchant" {
+		return resp, helper.ErrInvalidRole
+	}
 
-// }
+	product, err := s.pRepo.GetProductById(ctx, id)
+	if err != nil {
+		if sql.ErrNoRows == err {
+			err = helper.ErrNotFound
+		}
+		return
+	}
 
-// func (s Service) DeleteProduct(ctx context.Context, model Product, param int) (err error) {
-// 	if err = s.repo.DeleteProduct(ctx, model, param); err != nil {
-// 		log.Println("error when try to Delete to database with error :", err.Error())
-// 		return
-// 	}
-// 	return
+	resp = NewProduct().ProductDetailResponse(product)
 
-// }
+	return
+}
+
+func (s Service) UpdateProduct(ctx context.Context, req Product, email string) (err error) {
+	auth, err := s.aRepo.GetAuthByEmail(ctx, email)
+	if err != nil {
+		log.Println("error when try to get auth by email with error", err)
+		return
+	}
+
+	if auth.Role != "Merchant" {
+		return helper.ErrInvalidRole
+	}
+
+	product, err := s.pRepo.GetProductById(ctx, req.Id)
+	if err != nil {
+		log.Println("error when try to get product by id with error", err)
+		if sql.ErrNoRows == err {
+			err = helper.ErrNotFound
+		}
+		return
+	}
+
+	if product.Id == 0 {
+		return helper.ErrNotFound
+	}
+
+	// _, err = s.categoryRepository.GetById(ctx, req.CategoryId)
+	// if err != nil {
+	// 	if sql.ErrNoRows == err {
+	// 		err = helper.ErrCategoriesNotFound
+	// 	}
+	// 	return
+	// }
+
+	err = s.pRepo.UpdateProduct(ctx, req)
+	if err != nil {
+		log.Println("error when try to update product with error", err)
+		return
+	}
+
+	return
+}
+
+func (s Service) GetDetailProductUserPerspective(ctx context.Context, sku string) (resp GetDetailProductUserPerspectiveResponse, err error) {
+	product, err := s.pRepo.GetProductBySku(ctx, sku)
+	if err != nil {
+		if sql.ErrNoRows == err {
+			err = helper.ErrNotFound
+		}
+		return
+	}
+
+	resp = NewProduct().ProductDetailUserPerspectiveResponse(product)
+
+	return
+}

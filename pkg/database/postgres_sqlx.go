@@ -48,30 +48,34 @@ func Migrate(db *sqlx.DB) (err error) {
 
 		CREATE TABLE IF NOT EXISTS categories (
 			id SERIAL PRIMARY KEY,
-			category_name varchar(100) NOT NULL
+			name varchar(100) NOT NULL,
+			UNIQUE (name)
 		);
 
 		CREATE TABLE IF NOT EXISTS products (
 			id SERIAL PRIMARY KEY,
 			name varchar(100) NOT NULL,
+			description varchar(255) NOT NULL,
 			stock int NOT NULL,
 			price int NOT NULL,
 			category_id int NOT NULL,
 			image_url varchar(100) NOT NULL,
-			email_auth varchar(100),
-			FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+			merchant_id int NOT NULL,
+			sku varchar(100) NOT NULL,
+			FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+			FOREIGN KEY ("merchant_id") REFERENCES "merchants" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 		);
 
 
 		CREATE TABLE IF NOT EXISTS users (
 			id SERIAL PRIMARY KEY,
 			auth_id int NOT NULL,
-			name VARCHAR(255) NOT NULL,
+			name VARCHAR(100) NOT NULL,
 			date_of_birth DATE NOT NULL,
 			phone_number VARCHAR(20) NOT NULL,
 			gender genders NOT NULL,
-			address VARCHAR(255) NOT NULL,
-			image_url VARCHAR(255) NOT NULL,
+			address VARCHAR(100) NOT NULL,
+			image_url VARCHAR(100) NOT NULL,
 			FOREIGN KEY ("auth_id") REFERENCES "auths" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
 			UNIQUE (auth_id)
 		);
@@ -79,10 +83,10 @@ func Migrate(db *sqlx.DB) (err error) {
 		CREATE TABLE IF NOT EXISTS merchants (
 			id SERIAL PRIMARY KEY,
 			auth_id int NOT NULL,
-			name VARCHAR(255) NOT NULL,
+			name VARCHAR(100) NOT NULL,
 			phone_number VARCHAR(20) NOT NULL,
-			address VARCHAR(255) NOT NULL,
-			image_url VARCHAR(255) NOT NULL,
+			address VARCHAR(100) NOT NULL,
+			image_url VARCHAR(100) NOT NULL,
 			city varchar(100) NOT NULL,
 			FOREIGN KEY ("auth_id") REFERENCES "auths" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
 			UNIQUE (auth_id)

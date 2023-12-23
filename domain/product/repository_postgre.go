@@ -18,12 +18,12 @@ func NewPostgresSQLXRepository(db *sqlx.DB) PostgresSQLXRepository {
 	}
 }
 
-func (r PostgresSQLXRepository) InsertProduct(ctx context.Context, model Product) (id int, err error) {
+func (r PostgresSQLXRepository) InsertProduct(ctx context.Context, product Product) (id int, err error) {
 	query := `
 		INSERT INTO products (
-			name, image_url, stock, price, category_id, email_auth
+			name, description, price, stock, category_id, merchant_id, image_url, sku
 		) VALUES (
-			:name, :image_url, :stock, :price, :category_id, :email_auth
+			:name, :description, :price, :stock, :category_id, :merchant_id, :image_url, :sku
 		)
 		RETURNING id
 	`
@@ -34,7 +34,7 @@ func (r PostgresSQLXRepository) InsertProduct(ctx context.Context, model Product
 	}
 	defer stmt.Close()
 
-	err = stmt.GetContext(ctx, &id, model)
+	err = stmt.GetContext(ctx, &id, product)
 	if err != nil {
 		return
 	}
@@ -42,36 +42,14 @@ func (r PostgresSQLXRepository) InsertProduct(ctx context.Context, model Product
 	return
 }
 
-// func (r PostgresSQLXRepository) FindAllProducts(ctx context.Context) (list []Product, err error) {
-// 	query := `
-// 		SELECT
-// 			id, name, image_url, stock, price, category_id, email_auth, category
-// 		FROM products
-// 	`
-
-// 	err = r.db.SelectContext(ctx, &list, query)
-// 	if err != nil {
-// 		if err == sql.ErrNoRows {
-// 			return nil, ErrNotFound
-// 		}
-// 		return
-// 	}
-
-// 	if len(list) == 0 {
-// 		return nil, err
-// 	}
-
-// 	return list, nil
-// }
-
-func (r PostgresSQLXRepository) FindProductByEmail(ctx context.Context, queryParam string, email string, limit int, page int) (list []Product, totalData int, err error) {
-	queryByEmail := `
+func (r PostgresSQLXRepository) GetProducts(ctx context.Context, queryParam string, id int, limit int, page int) (list []Product, totalData int, err error) {
+	queryGet := `
 		SELECT 
-			p.id, p.name, p.image_url, p.stock, p.price, c.category_name as category, p.email_auth
+			p.id, p.name, p.description, p.price, p.stock, c.name as category, p.image_url, p.sku
 		FROM products as p
 		JOIN categories as c
 			ON c.id = p.category_id
-		WHERE p.email_auth = $1
+		WHERE p.merchant_id = $1
 	`
 
 	queryCountByEmail := `
@@ -79,7 +57,7 @@ func (r PostgresSQLXRepository) FindProductByEmail(ctx context.Context, queryPar
 		FROM products as p
 		JOIN categories as c 
 			ON c.id = p.category_id
-		WHERE p.email_auth = $1
+		WHERE p.merchant_id = $1
 	`
 
 	filter := mappingQueryFilter(queryParam)
@@ -87,14 +65,14 @@ func (r PostgresSQLXRepository) FindProductByEmail(ctx context.Context, queryPar
 	queryLimitOffset := fmt.Sprintf("LIMIT %d OFFSET %d", limit, offset)
 
 	queryCount := fmt.Sprintf("%s %s %s", queryCountByEmail, filter, queryLimitOffset)
-	query := fmt.Sprintf("%s %s %s", queryByEmail, filter, queryLimitOffset)
+	query := fmt.Sprintf("%s %s %s", queryGet, filter, queryLimitOffset)
 
-	err = r.db.SelectContext(ctx, &list, query, email)
+	err = r.db.SelectContext(ctx, &list, query, id)
 	if err != nil {
 		return
 	}
 
-	err = r.db.GetContext(ctx, &totalData, queryCount, email)
+	err = r.db.GetContext(ctx, &totalData, queryCount, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			totalData = 0
@@ -114,4 +92,75 @@ func mappingQueryFilter(queryParam string) string {
 	}
 
 	return filter
+}
+
+func (r PostgresSQLXRepository) GetProductById(ctx context.Context, id int) (product Product, err error) {
+	query := `
+	SELECT
+		p.id,
+		p.sku,
+		p.name,
+		p.description,
+		p.price,
+		p.stock,
+		c.name as category,
+		p.category_id,
+		p.image_url,
+		p.created_at,
+		p.updated_at
+	FROM products as p
+	JOIN categories as c ON c.id = p.category_id
+	WHERE p.id = $1
+	`
+	err = r.db.GetContext(ctx, &product, query, id)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (r PostgresSQLXRepository) UpdateProduct(ctx context.Context, product Product) (err error) {
+	query := `
+	UPDATE products SET 
+		name = :name, 
+		description = :description, 
+		price = :price, 
+		stock = :stock, 
+		category_id = :category_id, 
+		image_url = :image_url, 
+		updated_at = NOW() 
+	WHERE id = :id
+	`
+	stmt, err := r.db.PrepareNamedContext(ctx, query)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, product)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (r PostgresSQLXRepository) GetProductBySku(ctx context.Context, sku string) (product Product, err error) {
+	query := `
+	SELECT p.id, p.sku, p.name, p.description, p.price, p.stock, c.name as category, p.category_id, p.merchant_id, p.image_url, p.created_at, p.updated_at, m.name as merchant_name, m.city as merchant_city
+	FROM products as p
+	JOIN categories as c 
+		ON c.id = p.category_id
+	JOIN merchants as m 
+		ON m.id = p.merchant_id
+	WHERE p.sku = $1
+`
+
+	err = r.db.GetContext(ctx, &product, query, sku)
+	if err != nil {
+		return
+	}
+
+	return
 }

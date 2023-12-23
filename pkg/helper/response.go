@@ -15,16 +15,22 @@ var (
 	ErrDuplicateEmail      = errors.New("email already used")
 	ErrUserAlreadyMerchant = errors.New("user already as a merchant")
 
-	ErrCategoriesNotFound = errors.New("categories not found")
+	ErrEmptyCategoryName     = errors.New("name is required")
+	ErrCategoriesNotFound    = errors.New("categories not found")
+	ErrNotFoundCategoryId    = errors.New("category_id not found")
+	ErrDuplicateNameCategory = errors.New("category name already used")
 
 	ErrUnauthorized = errors.New("unauthorized")
 
-	ErrEmptyName       = errors.New("name is required")
-	ErrEmptyImageURL   = errors.New("image_url is required")
-	ErrEmptyStock      = errors.New("stock is required")
-	ErrEmptyPrice      = errors.New("price is required")
-	ErrEmptyCategoryId = errors.New("category_id is required")
-	ErrNotFound        = errors.New("product not found")
+	ErrEmptyName        = errors.New("name is required")
+	ErrEmptyImageURL    = errors.New("image_url is required")
+	ErrEmptyStock       = errors.New("stock is required")
+	ErrEmptyPrice       = errors.New("price is required")
+	ErrEmptyCategoryId  = errors.New("category_id is required")
+	ErrNotFound         = errors.New("product not found")
+	ErrInvalidPrice     = errors.New("price is invalid")
+	ErrInvalidStock     = errors.New("stock is invalid")
+	ErrEmptyDescription = errors.New("description is required")
 
 	ErrGenderEmpty        = errors.New("gender is required")
 	ErrInvalidGender      = errors.New("gender is invalid")
@@ -108,6 +114,7 @@ func ResponseError(c *fiber.Ctx, err error) error {
 		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40003", nil)
 	case err == ErrInvalidPassword:
 		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40004", nil)
+
 	case err == ErrDuplicateEmail:
 		return ApiResponse(c, http.StatusConflict, false, "duplicate entry", err.Error(), "40901", nil)
 	case err == ErrUserAlreadyMerchant:
@@ -115,20 +122,30 @@ func ResponseError(c *fiber.Ctx, err error) error {
 
 	case err == ErrCategoriesNotFound:
 		return ApiResponse(c, http.StatusNotFound, false, "category not found", err.Error(), "40401", nil)
+	case err == ErrDuplicateNameCategory:
+		return ApiResponse(c, http.StatusConflict, false, "duplicate entry", err.Error(), "40901", nil)
 
 	case err == ErrUnauthorized:
 		return ApiResponse(c, http.StatusUnauthorized, false, "unauthorized", err.Error(), "40101", nil)
 
+	case err == ErrInvalidPrice:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40002", nil)
+	case err == ErrInvalidStock:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40004", nil)
+	case err == ErrEmptyDescription:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40006", nil)
 	case err == ErrEmptyName:
-		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40401", nil)
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40005", nil)
 	case err == ErrEmptyImageURL:
-		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40402", nil)
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40407", nil)
 	case err == ErrEmptyStock:
 		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40403", nil)
 	case err == ErrEmptyPrice:
-		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40404", nil)
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40001", nil)
 	case err == ErrEmptyCategoryId:
-		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40405", nil)
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40008", nil)
+	case err == ErrNotFoundCategoryId:
+		return ApiResponse(c, http.StatusBadRequest, false, "bad request", err.Error(), "40009", nil)
 	case err == ErrNotFound:
 		return ApiResponse(c, http.StatusNotFound, false, "category not found", err.Error(), "40401", nil)
 
