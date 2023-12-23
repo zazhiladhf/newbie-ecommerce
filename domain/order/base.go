@@ -21,5 +21,6 @@ func RegisterRouteOrder(router fiber.Router, sqlx *sqlx.DB, mongo *mongo.Databas
 	orderRoute := router.Group("/v1/orders")
 	{
 		orderRoute.Post("", middleware.AuthMiddleware(), handler.Checkout)
+		orderRoute.Get("/user", middleware.AuthMiddleware(), handler.OrderHistories)
 	}
 }

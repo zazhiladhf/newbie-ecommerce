@@ -3,6 +3,7 @@ package order
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/zazhiladhf/newbie-ecommerce/config"
@@ -13,6 +14,7 @@ import (
 
 type OrderRepository interface {
 	CreateOrder(ctx context.Context, payload Order) (order Order, err error)
+	GetOrderHistories(ctx context.Context, limit, page, userId int) (orders []Order, totalPage int, err error)
 }
 
 type PaymentRepository interface {
@@ -34,6 +36,60 @@ func NewService(productRepo product.ProductRepository, userRepo user.UserReposit
 		paymentRepo: paymentRepo,
 		userRepo:    userRepo,
 	}
+}
+
+func (s service) GetOrderHistories(ctx context.Context, req GetOrderHistoriesRequest) (resp []GetOrderHistoriesResponse, totalPage int, err error) {
+	user, err := s.userRepo.GetUserByAuthId(ctx, req.AuthId)
+	if err != nil {
+		log.Println("error when try to get user with error", err)
+		return resp, totalPage, err
+	}
+
+	orders, totalPage, err := s.orderRepo.GetOrderHistories(ctx, req.Limit, req.Page, user.Id)
+	if err != nil {
+		return nil, totalPage, err
+	}
+
+	for _, v := range orders {
+		var platformFee float32 = 0
+
+		for _, x := range v.AdditionalFee {
+			if x.Type == "plarform_fee" {
+				platformFee = x.Value
+			}
+		}
+
+		temp := GetOrderHistoriesResponse{
+			CreatedAt:  v.CreatedAt,
+			GrandTotal: v.GrandTotal,
+			Id:         v.Id.Hex(),
+			InvoiceUrl: v.InvoiceUrl,
+			Merchant: MerchantData{
+				Id:   v.Product.MerchantId,
+				Name: v.Product.MerchantName,
+			},
+			PlatformFee: platformFee,
+			Price:       v.Price,
+			Product: ProductData{
+				Id:          v.Product.Id,
+				Category:    v.Product.Category,
+				Description: v.Product.Description,
+				ImageUrl:    v.Product.ImageURL,
+				Name:        v.Product.Name,
+				Price:       float32(v.Product.Price),
+				Stock:       v.Product.Stock,
+			},
+			Quantity:  v.Quantity,
+			Status:    v.Status,
+			SubTotal:  v.SubTotal,
+			UpdatedAt: v.UpdatedAt,
+			Uuid:      v.Uuid,
+		}
+
+		resp = append(resp, temp)
+	}
+
+	return resp, totalPage, nil
 }
 
 func (s service) Checkout(ctx context.Context, req CheckoutRequest) (resp CheckoutResponse, err error) {
@@ -75,16 +131,21 @@ func (s service) Checkout(ctx context.Context, req CheckoutRequest) (resp Checko
 		Id:              primitive.NewObjectID(),
 		ProductId:       product.Id,
 		ExternalId:      uuid.NewString(),
+		UserId:          user.Id,
+		Uuid:            uuid.NewString(),
 		Price:           float32(product.Price),
 		AdditionalFee:   nil,
 		SubTotal:        float32(product.Price * req.Quantity),
 		UserEmail:       user.Auth.Email,
 		UserName:        user.Name,
 		PhoneNumber:     user.PhoneNumber,
-		Description:     "payment for transaction in apotek",
+		Description:     product.Description,
 		InvoiceDuration: config.Cfg.Payment.InvoiceDuration,
 		Product:         product,
 		Quantity:        req.Quantity,
+		Status:          "UNPAID",
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
 	}
 
 	payload.setTotal()

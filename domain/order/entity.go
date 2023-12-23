@@ -12,6 +12,8 @@ type Order struct {
 	Id          primitive.ObjectID `bson:"_id"`
 	ProductId   int                `bson:"product_id"`
 	ExternalId  string             `bson:"external_id"`
+	UserId      int                `bson:"user_id"`
+	Uuid        string             `bson:"uuid"`
 	UserEmail   string             `json:"user_email"`
 	UserName    string             `json:"user_name"`
 	PhoneNumber string             `json:"phone_number"`
