@@ -51,3 +51,17 @@ type ProductData struct {
 	Price       float32 `json:"price"`
 	Stock       int     `json:"stock"`
 }
+
+type GeListOrdersResponse struct {
+	CreatedAt   time.Time   `json:"created_at"`
+	GrandTotal  float32     `json:"grand_total"`
+	Id          string      `json:"id"`
+	PlatformFee float32     `json:"paltfrom_fee"`
+	Price       float32     `json:"price"`
+	Product     ProductData `json:"product"`
+	Quantity    int         `json:"quantity"`
+	Status      string      `json:"status"`
+	SubTotal    float32     `json:"sub_total"`
+	UpdatedAt   time.Time   `json:"updated_at"`
+	Uuid        string      `json:"uuid"`
+}

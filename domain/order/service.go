@@ -15,6 +15,7 @@ import (
 type OrderRepository interface {
 	CreateOrder(ctx context.Context, payload Order) (order Order, err error)
 	GetOrderHistories(ctx context.Context, limit, page, userId int) (orders []Order, totalPage int, err error)
+	GetOrdersByMerchant(ctx context.Context, limit, page, merchantId int) (orders []Order, totalPage int, err error)
 }
 
 type PaymentRepository interface {
@@ -36,6 +37,55 @@ func NewService(productRepo product.ProductRepository, userRepo user.UserReposit
 		paymentRepo: paymentRepo,
 		userRepo:    userRepo,
 	}
+}
+
+func (s service) GetListOrders(ctx context.Context, req GetOrderHistoriesRequest) (resp []GeListOrdersResponse, totalPage int, err error) {
+	user, err := s.userRepo.GetUserByAuthId(ctx, req.AuthId)
+	if err != nil {
+		log.Println("error when try to get user with error", err)
+		return resp, totalPage, err
+	}
+
+	orders, totalPage, err := s.orderRepo.GetOrdersByMerchant(ctx, req.Limit, req.Page, user.Id)
+	if err != nil {
+		return nil, totalPage, err
+	}
+
+	for _, v := range orders {
+		var platformFee float32 = 0
+
+		for _, x := range v.AdditionalFee {
+			if x.Type == "plarform_fee" {
+				platformFee = x.Value
+			}
+		}
+
+		temp := GeListOrdersResponse{
+			CreatedAt:   v.CreatedAt,
+			GrandTotal:  v.GrandTotal,
+			Id:          v.Id.Hex(),
+			PlatformFee: platformFee,
+			Price:       v.Price,
+			Product: ProductData{
+				Id:          v.Product.Id,
+				Category:    v.Product.Category,
+				Description: v.Product.Description,
+				ImageUrl:    v.Product.ImageURL,
+				Name:        v.Product.Name,
+				Price:       float32(v.Product.Price),
+				Stock:       v.Product.Stock,
+			},
+			Quantity:  v.Quantity,
+			Status:    v.Status,
+			SubTotal:  v.SubTotal,
+			UpdatedAt: v.UpdatedAt,
+			Uuid:      v.Uuid,
+		}
+
+		resp = append(resp, temp)
+	}
+
+	return resp, totalPage, nil
 }
 
 func (s service) GetOrderHistories(ctx context.Context, req GetOrderHistoriesRequest) (resp []GetOrderHistoriesResponse, totalPage int, err error) {
