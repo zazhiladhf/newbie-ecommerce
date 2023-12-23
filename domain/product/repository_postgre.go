@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/zazhiladhf/newbie-ecommerce/pkg/helper"
 )
 
 type PostgresSQLXRepository struct {
@@ -37,6 +38,32 @@ func (r PostgresSQLXRepository) InsertProduct(ctx context.Context, product Produ
 	err = stmt.GetContext(ctx, &id, product)
 	if err != nil {
 		return
+	}
+
+	return
+}
+
+func (r PostgresSQLXRepository) GetAllProducts(ctx context.Context) (productList []Product, err error) {
+	query := `
+		SELECT p.id, p.sku, p.name, p.description, p.price, p.stock, c.name as category, p.category_id, p.merchant_id, p.image_url, p.created_at, p.updated_at, m.name as merchant_name, m.city as merchant_city
+		FROM products as p
+		JOIN categories as c 
+			ON c.id = p.category_id
+		JOIN merchants as m 
+			ON m.id = p.merchant_id
+	`
+
+	err = r.db.SelectContext(ctx, &productList, query)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, helper.ErrNotFound
+		}
+
+		return
+	}
+
+	if len(productList) == 0 {
+		return nil, helper.ErrNotFound
 	}
 
 	return

@@ -11,6 +11,7 @@ import (
 
 type ProductRepository interface {
 	InsertProduct(ctx context.Context, product Product) (id int, err error)
+	GetAllProducts(ctx context.Context) (productList []Product, err error)
 	GetProducts(ctx context.Context, queryParam string, id int, limit int, page int) (list []Product, totalData int, err error)
 	GetProductById(ctx context.Context, id int) (product Product, err error)
 	UpdateProduct(ctx context.Context, product Product) (err error)
@@ -18,7 +19,9 @@ type ProductRepository interface {
 }
 
 type SearchEngineInterface interface {
+	GetAll(ctx context.Context) (productList []Product, err error)
 	SyncPartial(ctx context.Context, productList []Product) (statusId int, err error)
+	SyncAll(ctx context.Context, productList []Product) (statusId int, err error)
 }
 
 type AuthRepository interface {
@@ -60,13 +63,43 @@ func (s Service) CreateProductByMerchant(ctx context.Context, req Product, email
 
 	status, err := s.search.SyncPartial(ctx, []Product{req})
 	if err != nil {
-		log.Println("error when try to sync pertial with error :", err.Error())
+		log.Println("error when try to sync partial with error :", err.Error())
 		return err
 	}
 
 	log.Println("status id", status)
 
 	return
+}
+
+func (s Service) GetAllProducts(ctx context.Context) (taskId int, err error) {
+	products, err := s.pRepo.GetAllProducts(ctx)
+	if err != nil {
+		return -1, err
+	}
+
+	taskId, err = s.search.SyncAll(ctx, products)
+	if err != nil {
+		return -1, err
+	}
+
+	log.Println("status id", taskId)
+	return
+}
+
+func (s Service) syncAll(ctx context.Context) (taskId int, err error) {
+	productList, err := s.pRepo.GetAllProducts(ctx)
+	if err != nil {
+		return -1, err
+	}
+	taskId, err = s.search.SyncAll(ctx, productList)
+	if err != nil {
+		return -1, err
+	}
+
+	log.Println("status id", taskId)
+	return
+
 }
 
 func (s Service) GetListProductsMerchant(ctx context.Context, queryParam string, email string, limit int, page int) (resp []GetListProductResponse, totalData int, err error) {

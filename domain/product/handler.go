@@ -58,6 +58,16 @@ func (h ProductHandler) CreateProduct(c *fiber.Ctx) error {
 	return helper.ResponseSuccess(c, true, "create product success", http.StatusCreated, nil, nil)
 }
 
+func (h ProductHandler) GetAllProducts(c *fiber.Ctx) error {
+	resp, err := h.svc.GetAllProducts(c.UserContext())
+	if err != nil {
+		log.Println("error when try to get all product with error", err)
+		return helper.ResponseError(c, err)
+	}
+
+	return helper.ResponseSuccess(c, true, "get products success", http.StatusOK, resp, nil)
+}
+
 func (h ProductHandler) GetListProducts(c *fiber.Ctx) error {
 	queryParam := c.Query("query")
 	email := c.Locals("email").(string)
@@ -174,5 +184,5 @@ func (h ProductHandler) GetDetailProductUserPerspective(c *fiber.Ctx) error {
 		return helper.ResponseError(c, err)
 	}
 
-	return helper.ResponseSuccess(c, true, "get products success", fiber.StatusOK, resp, nil)
+	return helper.ResponseSuccess(c, true, "get products success", http.StatusOK, resp, nil)
 }

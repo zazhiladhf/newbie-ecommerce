@@ -11,11 +11,12 @@ import (
 	"github.com/zazhiladhf/newbie-ecommerce/domain/files"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/merchant"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/product"
+	"github.com/zazhiladhf/newbie-ecommerce/domain/search"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/user"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/database"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/images"
+	"github.com/zazhiladhf/newbie-ecommerce/pkg/meili"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/middleware"
-	"github.com/zazhiladhf/newbie-ecommerce/pkg/search"
 )
 
 // type CloudSvc interface {
@@ -80,7 +81,7 @@ func main() {
 	}
 
 	// setup meilisearch
-	client, err := search.ConnectMeilisearch(config.Cfg.Meili.Host, config.Cfg.Meili.ApiKey)
+	client, err := meili.ConnectMeilisearch(config.Cfg.Meili.Host, config.Cfg.Meili.ApiKey)
 	if err != nil {
 		log.Println("error connect meili", err)
 	}
@@ -110,6 +111,7 @@ func main() {
 	files.RegisterRoutesFile(router, cloudClient, cloudName, apiKey, apiSecret)
 	user.RegisterRoutesUser(router, dbSqlx)
 	merchant.RegisterRoutesMerchant(router, dbSqlx)
+	search.RegisterRoutesMeili(router, client)
 
 	// listen app
 	router.Listen(config.Cfg.App.Port)
