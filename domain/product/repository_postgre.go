@@ -96,18 +96,7 @@ func mappingQueryFilter(queryParam string) string {
 
 func (r PostgresSQLXRepository) GetProductById(ctx context.Context, id int) (product Product, err error) {
 	query := `
-	SELECT
-		p.id,
-		p.sku,
-		p.name,
-		p.description,
-		p.price,
-		p.stock,
-		c.name as category,
-		p.category_id,
-		p.image_url,
-		p.created_at,
-		p.updated_at
+	SELECT p.id, p.sku, p.name, p.description, p.price, p.stock, c.name as category, p.category_id, p.image_url, p.created_at, p.updated_at
 	FROM products as p
 	JOIN categories as c ON c.id = p.category_id
 	WHERE p.id = $1

@@ -62,6 +62,8 @@ func Migrate(db *sqlx.DB) (err error) {
 			image_url varchar(100) NOT NULL,
 			merchant_id int NOT NULL,
 			sku varchar(100) NOT NULL,
+			created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+			updated_at TIMESTAMP WITH TIME ZONE NULL DEFAULT NOW(),
 			FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
 			FOREIGN KEY ("merchant_id") REFERENCES "merchants" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 		);
