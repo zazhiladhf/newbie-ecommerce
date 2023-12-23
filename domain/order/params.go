@@ -65,3 +65,47 @@ type GeListOrdersResponse struct {
 	UpdatedAt   time.Time   `json:"updated_at"`
 	Uuid        string      `json:"uuid"`
 }
+
+type WebhookInvoiceRequest struct {
+	Id                 string    `json:"id"`
+	ExternalId         string    `json:"external_id"`
+	UserId             string    `json:"user_id"`
+	IsHigh             bool      `json:"is_high"`
+	Status             string    `json:"status"`
+	MerchantName       string    `json:"merchant_name"`
+	Amount             float64   `json:"amount"`
+	PaidAmount         float64   `json:"paid_amount"`
+	PayerEmail         string    `json:"payer_email"`
+	Description        string    `json:"description"`
+	UpdatedAt          time.Time `json:"updated_at"`
+	CreatedAt          time.Time `json:"created_at"`
+	PaidAt             time.Time `json:"paid_at"`
+	Currency           string    `json:"currency"`
+	PaymentChannel     string    `json:"payment_channel"`
+	PaymentMethod      string    `json:"payment_method"`
+	PaymentDestination string    `json:"payment_destination"`
+	PaymentId          string    `json:"payment_id"`
+}
+
+func (r WebhookInvoiceRequest) parseToInvoice() Invoice {
+	return Invoice{
+		Id:                 r.Id,
+		ExternalId:         r.ExternalId,
+		UserId:             r.UserId,
+		IsHigh:             r.IsHigh,
+		Status:             r.Status,
+		MerchantName:       r.MerchantName,
+		Amount:             r.Amount,
+		PaidAmount:         r.PaidAmount,
+		PayerEmail:         r.PayerEmail,
+		Description:        r.Description,
+		UpdatedAt:          r.UpdatedAt,
+		CreatedAt:          r.CreatedAt,
+		PaidAt:             r.PaidAt,
+		Currency:           r.Currency,
+		PaymentChannel:     r.PaymentChannel,
+		PaymentMethod:      r.PaymentMethod,
+		PaymentDestination: r.PaymentDestination,
+		PaymentId:          r.PaymentId,
+	}
+}

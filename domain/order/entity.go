@@ -28,8 +28,30 @@ type Order struct {
 	Description     string          `bson:"description,omitempty"`
 	Status          string          `bson:"status"`
 	Product         product.Product `bson:"product"`
+	Invoice         Invoice         `bson:"invoice"`
 	CreatedAt       time.Time       `bson:"created_at"`
 	UpdatedAt       time.Time       `bson:"updated_at"`
+}
+
+type Invoice struct {
+	Id                 string    `bson:"id"`
+	ExternalId         string    `bson:"external_id"`
+	UserId             string    `bson:"user_id"`
+	IsHigh             bool      `bson:"is_high"`
+	Status             string    `bson:"status"`
+	MerchantName       string    `bson:"merchant_name"`
+	Amount             float64   `bson:"amount"`
+	PaidAmount         float64   `bson:"paid_amount"`
+	PayerEmail         string    `bson:"payer_email"`
+	Description        string    `bson:"description"`
+	UpdatedAt          time.Time `bson:"updated_at"`
+	CreatedAt          time.Time `bson:"created_at"`
+	PaidAt             time.Time `bson:"paid_at"`
+	Currency           string    `bson:"currency"`
+	PaymentChannel     string    `bson:"payment_channel"`
+	PaymentMethod      string    `bson:"payment_method"`
+	PaymentDestination string    `bson:"payment_destination"`
+	PaymentId          string    `bson:"payment_id"`
 }
 
 type AdditionalFee struct {

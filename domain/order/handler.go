@@ -19,6 +19,24 @@ func NewHandler(service service) Handler {
 	}
 }
 
+func (h Handler) Webhook(c *fiber.Ctx) (err error) {
+	var req WebhookInvoiceRequest
+
+	err = c.BodyParser(&req)
+	if err != nil {
+		log.Println("error when try to parsing body request with error", err)
+		return helper.ResponseError(c, err)
+	}
+
+	err = h.service.HandlePaymentStatus(c.UserContext(), req)
+	if err != nil {
+		log.Println("error when handle payment status error", err)
+		return helper.ResponseError(c, err)
+	}
+
+	return helper.ResponseSuccess(c, true, "success", http.StatusOK, nil, nil)
+}
+
 func (h Handler) Checkout(c *fiber.Ctx) (err error) {
 	var req CheckoutRequest
 
@@ -35,7 +53,7 @@ func (h Handler) Checkout(c *fiber.Ctx) (err error) {
 
 	resp, err := h.service.Checkout(c.UserContext(), req)
 	if err != nil {
-		log.Println("error when try to parsing body request with error", err)
+		log.Println("error when checkout error", err)
 		return helper.ResponseError(c, err)
 	}
 
@@ -97,6 +115,3 @@ func (h Handler) ListOrders(c *fiber.Ctx) (err error) {
 
 	return helper.ResponseSuccess(c, true, "get orders success", http.StatusOK, resp, nil)
 }
-
-// func (h Handler) ListOrders(c *fiber.Ctx) (err error)
-// func (h Handler) Webhook(c *fiber.Ctx) (err error)

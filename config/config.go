@@ -56,6 +56,7 @@ type Payment struct {
 	SecretKey       string         `yaml:"secretKey"`
 	Redirect        redirectConfig `yaml:"redirectUrl"`
 	InvoiceDuration int            `yaml:"invoiceDuration"`
+	WebhookToken    string         `yaml:"webhookToken"`
 }
 
 type redirectConfig struct {

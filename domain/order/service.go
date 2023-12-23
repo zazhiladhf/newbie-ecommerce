@@ -16,6 +16,8 @@ type OrderRepository interface {
 	CreateOrder(ctx context.Context, payload Order) (order Order, err error)
 	GetOrderHistories(ctx context.Context, limit, page, userId int) (orders []Order, totalPage int, err error)
 	GetOrdersByMerchant(ctx context.Context, limit, page, merchantId int) (orders []Order, totalPage int, err error)
+	UpdateOrderStatus(ctx context.Context, order Order) (err error)
+	GetOrderByExternalId(ctx context.Context, externalId string) (order Order, err error)
 }
 
 type PaymentRepository interface {
@@ -39,6 +41,40 @@ func NewService(productRepo product.ProductRepository, userRepo user.UserReposit
 	}
 }
 
+func (s service) HandlePaymentStatus(ctx context.Context, req WebhookInvoiceRequest) (err error) {
+	order := Order{
+		ExternalId: req.ExternalId,
+		Status:     req.Status,
+		Invoice:    req.parseToInvoice(),
+	}
+
+	err = s.orderRepo.UpdateOrderStatus(ctx, order)
+	if err != nil {
+		return err
+	}
+
+	if req.Status != STATUS_Paid {
+		order, err := s.orderRepo.GetOrderByExternalId(ctx, req.ExternalId)
+		if err != nil {
+			return err
+		}
+
+		product, err := s.productRepo.GetProductById(ctx, order.ProductId)
+		if err != nil {
+			return err
+		}
+
+		product.Stock = order.Quantity + product.Stock
+
+		err = s.productRepo.UpdateProduct(ctx, product)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (s service) GetListOrders(ctx context.Context, req GetOrderHistoriesRequest) (resp []GeListOrdersResponse, totalPage int, err error) {
 	user, err := s.userRepo.GetUserByAuthId(ctx, req.AuthId)
 	if err != nil {
@@ -55,7 +91,7 @@ func (s service) GetListOrders(ctx context.Context, req GetOrderHistoriesRequest
 		var platformFee float32 = 0
 
 		for _, x := range v.AdditionalFee {
-			if x.Type == "plarform_fee" {
+			if x.Type == FEE_platform {
 				platformFee = x.Value
 			}
 		}
@@ -104,7 +140,7 @@ func (s service) GetOrderHistories(ctx context.Context, req GetOrderHistoriesReq
 		var platformFee float32 = 0
 
 		for _, x := range v.AdditionalFee {
-			if x.Type == "plarform_fee" {
+			if x.Type == FEE_platform {
 				platformFee = x.Value
 			}
 		}
@@ -193,7 +229,7 @@ func (s service) Checkout(ctx context.Context, req CheckoutRequest) (resp Checko
 		InvoiceDuration: config.Cfg.Payment.InvoiceDuration,
 		Product:         product,
 		Quantity:        req.Quantity,
-		Status:          "UNPAID",
+		Status:          STATUS_Unpaid,
 		CreatedAt:       time.Now(),
 		UpdatedAt:       time.Now(),
 	}

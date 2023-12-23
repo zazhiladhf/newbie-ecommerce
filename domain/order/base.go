@@ -23,5 +23,6 @@ func RegisterRouteOrder(router fiber.Router, sqlx *sqlx.DB, mongo *mongo.Databas
 		orderRoute.Post("", middleware.AuthMiddleware(), handler.Checkout)
 		orderRoute.Get("/user", middleware.AuthMiddleware(), handler.OrderHistories)
 		orderRoute.Get("/merchant", middleware.AuthMiddleware(), handler.ListOrders)
+		orderRoute.Post("/webhook", handler.Webhook)
 	}
 }
