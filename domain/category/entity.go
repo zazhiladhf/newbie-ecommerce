@@ -1,14 +1,22 @@
 package category
 
-import "errors"
-
-var (
-	ErrRepository         = errors.New("error repository")
-	ErrInternalServer     = errors.New("unknown error")
-	ErrCategoriesNotFound = errors.New("categories not found")
-)
+import "github.com/zazhiladhf/newbie-ecommerce/pkg/helper"
 
 type Category struct {
-	Id           int    `db:"id"`
-	CategoryName string `db:"category_name"`
+	Id   int    `db:"id"`
+	Name string `db:"name"`
+}
+
+func NewCategory() Category {
+	return Category{}
+}
+
+func (c Category) Validate(req CreateCategoryRequest) (Category, error) {
+	if req.Name == "" {
+		return c, helper.ErrEmptyCategoryName
+	}
+
+	c.Name = req.Name
+
+	return c, nil
 }

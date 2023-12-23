@@ -13,5 +13,6 @@ func RegisterRoutesCategory(router fiber.Router, db *sqlx.DB) {
 	categoryRouter := router.Group("/v1/categories")
 	{
 		categoryRouter.Get("/", handler.GetListCategories)
+		categoryRouter.Post("/", handler.CreateCategory)
 	}
 }
