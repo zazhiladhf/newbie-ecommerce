@@ -17,6 +17,26 @@ func NewPostgreSqlxRepository(db *sqlx.DB) PostgreSqlxRepository {
 	}
 }
 
+// GetUserByAuthId implements UserRepository.
+func (r PostgreSqlxRepository) GetUserByAuthId(ctx context.Context, authId int) (user User, err error) {
+	query := `
+		SELECT u.id, u.name, u.date_of_birth, u.phone_number, u.gender, u.address, u.image_url,
+			u.auth_id, a.id AS auth_id, a.email, a.password, a.role
+		FROM users u
+		JOIN auths a ON u.auth_id = a.id
+		WHERE u.auth_id = $1
+	`
+
+	err = r.db.GetContext(ctx, &user, query, authId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return User{}, nil
+		}
+	}
+
+	return
+}
+
 func (r PostgreSqlxRepository) InsertUser(ctx context.Context, user User) (err error) {
 	query := `
 		INSERT INTO users (

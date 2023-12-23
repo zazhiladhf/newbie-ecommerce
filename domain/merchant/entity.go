@@ -5,13 +5,13 @@ import (
 )
 
 type Merchant struct {
-	Id          int    `db:"id"`
-	Name        string `db:"name"`
-	PhoneNumber string `db:"phone_number"`
-	Address     string `db:"address"`
-	ImageUrl    string `db:"image_url"`
-	City        string `db:"city"`
-	AuthId      int    `db:"auth_id"`
+	Id          int    `db:"id" bson:"id"`
+	Name        string `db:"name" bson:"name"`
+	PhoneNumber string `db:"phone_number" bson:"phone_number"`
+	Address     string `db:"address" bson:"address"`
+	ImageUrl    string `db:"image_url" bson:"image_url"`
+	City        string `db:"city" bson:"city"`
+	AuthId      int    `db:"auth_id" bson:"auth_id"`
 }
 
 func NewMerchant() Merchant {

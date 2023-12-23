@@ -52,23 +52,6 @@ func Migrate(db *sqlx.DB) (err error) {
 			UNIQUE (name)
 		);
 
-		CREATE TABLE IF NOT EXISTS products (
-			id SERIAL PRIMARY KEY,
-			name varchar(100) NOT NULL,
-			description varchar(255) NOT NULL,
-			stock int NOT NULL,
-			price int NOT NULL,
-			category_id int NOT NULL,
-			image_url varchar(100) NOT NULL,
-			merchant_id int NOT NULL,
-			sku varchar(100) NOT NULL,
-			created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-			updated_at TIMESTAMP WITH TIME ZONE NULL DEFAULT NOW(),
-			FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-			FOREIGN KEY ("merchant_id") REFERENCES "merchants" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-		);
-
-
 		CREATE TABLE IF NOT EXISTS users (
 			id SERIAL PRIMARY KEY,
 			auth_id int NOT NULL,
@@ -93,6 +76,24 @@ func Migrate(db *sqlx.DB) (err error) {
 			FOREIGN KEY ("auth_id") REFERENCES "auths" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
 			UNIQUE (auth_id)
 		);
+
+		CREATE TABLE IF NOT EXISTS products (
+			id SERIAL PRIMARY KEY,
+			name varchar(100) NOT NULL,
+			description varchar(255) NOT NULL,
+			stock int NOT NULL,
+			price int NOT NULL,
+			category_id int NOT NULL,
+			image_url varchar(100) NOT NULL,
+			merchant_id int NOT NULL,
+			sku varchar(100) NOT NULL,
+			created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+			updated_at TIMESTAMP WITH TIME ZONE NULL DEFAULT NOW(),
+			FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+			FOREIGN KEY ("merchant_id") REFERENCES "merchants" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+		);
+
+
 
 	`
 	_, err = db.Exec(query)

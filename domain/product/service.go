@@ -5,9 +5,15 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/auth"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/helper"
 )
+
+type ProductRepositoryTx interface {
+	GetProductByIdForUpdate(ctx context.Context, id int) (product Product, err error)
+	UpdateProductStok(ctx context.Context, product Product) (err error)
+}
 
 type ProductRepository interface {
 	InsertProduct(ctx context.Context, product Product) (id int, err error)
@@ -15,6 +21,7 @@ type ProductRepository interface {
 	GetProductById(ctx context.Context, id int) (product Product, err error)
 	UpdateProduct(ctx context.Context, product Product) (err error)
 	GetProductBySku(ctx context.Context, sku string) (product Product, err error)
+	CheckoutProduct(ctx context.Context, id, quantity int) (tx *sqlx.Tx, err error)
 }
 
 type SearchEngineInterface interface {
