@@ -8,10 +8,11 @@ import (
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/helper"
 )
 
-type postgreSqlxRepository interface {
+type UserRepository interface {
 	InsertUser(ctx context.Context, user User) (err error)
 	GetUserById(ctx context.Context, id int) (user User, err error)
 	UpdateUser(ctx context.Context, req User) (err error)
+	GetUserByAuthId(ctx context.Context, authId int) (user User, err error)
 }
 
 type authRepository interface {
@@ -19,11 +20,11 @@ type authRepository interface {
 }
 
 type UserService struct {
-	userRepo postgreSqlxRepository
+	userRepo UserRepository
 	authRepo authRepository
 }
 
-func NewService(userRepo postgreSqlxRepository, authrepo authRepository) UserService {
+func NewService(userRepo UserRepository, authrepo authRepository) UserService {
 	return UserService{
 		userRepo: userRepo,
 		authRepo: authrepo,

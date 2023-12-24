@@ -51,7 +51,7 @@ func Migrate(db *sqlx.DB) (err error) {
 			name varchar(100) NOT NULL,
 			UNIQUE (name)
 		);
-
+    
 		CREATE TABLE IF NOT EXISTS merchants (
 			id SERIAL PRIMARY KEY,
 			auth_id int NOT NULL,
@@ -94,7 +94,6 @@ func Migrate(db *sqlx.DB) (err error) {
 			FOREIGN KEY ("auth_id") REFERENCES "auths" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
 			UNIQUE (auth_id)
 		);
-
 	`
 	_, err = db.Exec(query)
 

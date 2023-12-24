@@ -13,6 +13,8 @@ type Config struct {
 	Meili      Meili      `yaml:"meili"`
 	JWT        JWT        `yaml:"jwt"`
 	Cloudinary Cloudinary `yaml:"cloudinary"`
+	Payment    Payment    `yaml:"payment"`
+	MongoDB    MongoDB    `yaml:"mongo"`
 }
 
 type App struct {
@@ -48,6 +50,27 @@ type Cloudinary struct {
 	Name      string `yaml:"name"`
 	ApiKey    string `yaml:"apiKey"`
 	ApiSecret string `yaml:"apiSecret"`
+}
+
+type Payment struct {
+	SecretKey       string         `yaml:"secretKey"`
+	Redirect        redirectConfig `yaml:"redirectUrl"`
+	InvoiceDuration int            `yaml:"invoiceDuration"`
+	WebhookToken    string         `yaml:"webhookToken"`
+}
+
+type redirectConfig struct {
+	Success string `yaml:"success"`
+	Failure string `yaml:"failure"`
+}
+
+type MongoDB struct {
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Driver   string `yaml:"driver"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+	Name     string `yaml:"name"`
 }
 
 var Cfg *Config

@@ -9,6 +9,14 @@ db:
   password: "74712331"
   name: "newbie-ecommerce"
 
+mongo:
+  host: "localhost"
+  port: "27017"
+  driver: "mongodb"
+  username: "root"
+  password: "admin"
+  name: "newbie-ecommerce"
+
 redis:
   host: "localhost"
   port: "6377"
@@ -26,3 +34,11 @@ cloudinary:
   name: "zazhil-cloudinary"
   apiKey: "914726226983175"
   apiSecret: "cPSCFEY3kzElZNlOjXqwtdP8-6M"
+
+payment:
+  secretKey: "xnd_development_dXYUamyJEA7VI2MMe5ttKDVKJShkBzkvU9lm0bAl4euOpvz8xIgJk8Bql2s"
+  redirectUrl:
+    success: "www.google.com"
+    failure: "www.google.com"
+  invoiceDuration: 14400
+  webhookToken: "cekmDRjB9lhcW3Py0Zdl5vPDUE0jnWQF6tGuxarP9yY7B2cu"

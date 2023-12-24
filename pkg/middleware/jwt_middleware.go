@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/zazhiladhf/newbie-ecommerce/config"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/helper"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/jwt"
 )
@@ -63,6 +64,19 @@ func AuthMiddleware() fiber.Handler {
 		c.Locals("id", id)
 		c.Locals("email", email)
 		c.Locals("role", role)
+
+		return c.Next()
+	}
+}
+
+func XenditTokenValidation() fiber.Handler {
+	return func(c *fiber.Ctx) (err error) {
+		token := c.Get("X-Callback-Token")
+
+		if token != config.Cfg.Payment.WebhookToken {
+			log.Println("error when when try to webhook error", err)
+			return helper.ResponseError(c, helper.ErrUnauthorized)
+		}
 
 		return c.Next()
 	}
