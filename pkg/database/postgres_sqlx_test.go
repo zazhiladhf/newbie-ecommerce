@@ -9,7 +9,7 @@ import (
 
 func TestConnectionPostgres(t *testing.T) {
 	cfg := config.DB{
-		Host:     "localhost",
+		Host:     "103.193.176.215",
 		Port:     "5432",
 		User:     "postgres",
 		Password: "74712331",
@@ -23,7 +23,7 @@ func TestConnectionPostgres(t *testing.T) {
 	})
 
 	cfg = config.DB{
-		Host:     "localhost",
+		Host:     "103.193.176.215",
 		Port:     "5432",
 		User:     "postgres",
 		Password: "invalid password",
