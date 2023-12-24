@@ -3,7 +3,7 @@ app:
   port: ":4000"
 
 db:
-  host: "localhost"
+  host: "103.193.176.215"
   port: "5432"
   user: "postgres"
   password: "74712331"
