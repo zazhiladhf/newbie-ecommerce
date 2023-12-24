@@ -1,0 +1,49 @@
+kind: pipeline
+type: docker
+# pipeline name
+name: container-test-and-build
+
+steps:
+  # for unit testing
+  # unit test yang digunakan adalah Detroit Test
+  # jadi perlu nge running real database
+  - name: tests
+    # image golang dipilih karena aplikasi yang kita akan build adalah golang apps
+    image: golang
+    # environment yang dibutuhkan sama aplikasi golang
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: noobee
+      DB_PASS: noobee
+      DB_NAME: noobee
+    # ini akan menunjukkan bahwa step ini akan jalan
+    # setelah services/step yang namanya "db" selesai/sedang berjalan
+    depends_on:
+      - db
+    # custom command yang digunakan untuk menjalankan aplikasi
+    # biasanya diisi dengan running unit test, atau menjalankan docker run
+    commands:
+      - make run-test
+
+# untuk nge-running services database
+services:
+  # membuat services databse dengan nama `db`
+  - name: db
+    # menggunakan image postgres, karena DB yang digunakan pada golang apps
+    # kita adalah postgres
+    image: postgres
+    # setup environment variable
+    environment:
+      POSTGRES_PASSWORD: noobee
+      POSTGRES_USER: noobee
+      POSTGRES_DB: noobee
+
+# trigger drone saat ada event push pada branch master
+# kita bisa setup trigger dengan branch, atau event, atau branch dan event
+# pada kasus kali ini, kita menggunakan branch dan event
+trigger:
+  branch:
+    - main
+  event:
+    - push

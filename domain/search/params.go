@@ -1,10 +1,11 @@
 package search
 
 type SearchProductModel struct {
-	Query  string   `json:"query"`
-	Facets []string `json:"facets"`
-	Filter string   `json:"filter"`
-	Sort   []string `json:"sort"`
+	HitsPerPage int      `json:"hits_per_page"`
+	Query       string   `json:"query"`
+	Facets      []string `json:"facets"`
+	Filter      string   `json:"filter"`
+	Sort        []string `json:"sort"`
 
 	Pagination
 }

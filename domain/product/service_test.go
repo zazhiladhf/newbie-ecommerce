@@ -14,14 +14,6 @@ import (
 
 var svc Service
 
-// type config struct {
-// 	Host     string
-// 	Port     string
-// 	User     string
-// 	Password string
-// 	Name     string
-// }
-
 func init() {
 	cfg := config.DB{
 		Host:     "localhost",
