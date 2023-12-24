@@ -16,7 +16,7 @@ var svc Service
 
 func init() {
 	cfg := config.DB{
-		Host:     "localhost",
+		Host:     "103.193.176.215",
 		Port:     "5432",
 		User:     "postgres",
 		Password: "74712331",

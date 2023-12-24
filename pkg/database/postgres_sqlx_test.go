@@ -34,9 +34,4 @@ func TestConnectionPostgres(t *testing.T) {
 		_, err := ConnectPostgresSqlx(cfg)
 		require.NotNil(t, err)
 	})
-
-	// db, err := ConnectPostgresSqlx(cfg)
-	// if err != nil {
-	// 	panic(err)
-	// }
 }

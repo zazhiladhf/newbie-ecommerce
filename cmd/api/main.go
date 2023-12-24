@@ -19,39 +19,6 @@ import (
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/middleware"
 )
 
-// type CloudSvc interface {
-// 	Upload(ctx context.Context, file interface{}, pathDestination string, quality string) (uri string, err error)
-// }
-
-// // setup services
-// type service struct {
-// 	// disini kita akan menggunakan kontrak ke cloud providernya
-// 	cloud CloudSvc
-// }
-
-// var path = "public/uploads"
-// var svc = service{}
-
-// func init() {
-// 	err := config.LoadConfig("./config/config.yaml")
-// 	if err != nil {
-// 		log.Println("error when try to LoadConfig with error :", err.Error())
-// 	}
-
-// 	cloudName := config.Cfg.Cloudinary.Name
-// 	apiKey := config.Cfg.Cloudinary.ApiKey
-// 	apiSecret := config.Cfg.Cloudinary.ApiSecret
-
-// 	cloudClient, err := images.NewCloudinary(cloudName, apiKey, apiSecret)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	svc = service{
-// 		cloud: cloudClient,
-// 	}
-// }
-
 func main() {
 	// setup config
 	err := config.LoadConfig("./config/config.yaml")
