@@ -144,3 +144,33 @@ func (p Product) ProductDetailUserPerspectiveResponse(product Product) GetDetail
 
 	return response
 }
+
+func (p Product) AllProducts(products []Product) []GetDetailProductUserPerspectiveResponse {
+	resp := []GetDetailProductUserPerspectiveResponse{}
+
+	for _, product := range products {
+		response := GetDetailProductUserPerspectiveResponse{
+			Id:          product.Id,
+			Sku:         product.Sku,
+			Name:        product.Name,
+			Description: product.Description,
+			Price:       product.Price,
+			Stock:       product.Stock,
+			Category:    product.Category,
+			CategoryId:  product.CategoryId,
+			Merchant: merchant.MerchantResponse{
+				Id:   product.MerchantId,
+				Name: product.MerchantName,
+				City: product.MerchantCity,
+			},
+			ImageURL:  product.ImageURL,
+			CreatedAt: product.CreatedAt,
+			UpdatedAt: product.UpdatedAt,
+		}
+
+		resp = append(resp, response)
+
+	}
+
+	return resp
+}

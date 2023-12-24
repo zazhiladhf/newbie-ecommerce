@@ -12,46 +12,15 @@ import (
 	"github.com/zazhiladhf/newbie-ecommerce/domain/merchant"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/order"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/product"
+	"github.com/zazhiladhf/newbie-ecommerce/domain/search"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/user"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/database"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/images"
+	"github.com/zazhiladhf/newbie-ecommerce/pkg/meili"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/middleware"
 	paymentgateway "github.com/zazhiladhf/newbie-ecommerce/pkg/payment-gateway"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/search"
 )
-
-// type CloudSvc interface {
-// 	Upload(ctx context.Context, file interface{}, pathDestination string, quality string) (uri string, err error)
-// }
-
-// // setup services
-// type service struct {
-// 	// disini kita akan menggunakan kontrak ke cloud providernya
-// 	cloud CloudSvc
-// }
-
-// var path = "public/uploads"
-// var svc = service{}
-
-// func init() {
-// 	err := config.LoadConfig("./config/config.yaml")
-// 	if err != nil {
-// 		log.Println("error when try to LoadConfig with error :", err.Error())
-// 	}
-
-// 	cloudName := config.Cfg.Cloudinary.Name
-// 	apiKey := config.Cfg.Cloudinary.ApiKey
-// 	apiSecret := config.Cfg.Cloudinary.ApiSecret
-
-// 	cloudClient, err := images.NewCloudinary(cloudName, apiKey, apiSecret)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	svc = service{
-// 		cloud: cloudClient,
-// 	}
-// }
 
 func main() {
 	// setup config
@@ -82,7 +51,7 @@ func main() {
 	}
 
 	// setup meilisearch
-	client, err := search.ConnectMeilisearch(config.Cfg.Meili.Host, config.Cfg.Meili.ApiKey)
+	client, err := meili.ConnectMeilisearch(config.Cfg.Meili.Host, config.Cfg.Meili.ApiKey)
 	if err != nil {
 		log.Println("error connect meili", err)
 	}
@@ -123,6 +92,7 @@ func main() {
 	user.RegisterRoutesUser(router, dbSqlx)
 	merchant.RegisterRoutesMerchant(router, dbSqlx)
 	order.RegisterRouteOrder(router, dbSqlx, mongoDB, xenditClient)
+	search.RegisterRoutesMeili(router, client)
 
 	// listen app
 	router.Listen(config.Cfg.App.Port)

@@ -27,6 +27,8 @@ func NewHandler(svc images.Cloudinary) cloudHandler {
 }
 
 func (h cloudHandler) Upload(c *fiber.Ctx) error {
+	typeFile := c.FormValue("type", "")
+	quality := c.FormValue("quality", "10 ")
 	file, err := c.FormFile("file")
 	if err != nil {
 		log.Println("error when try to parse FormFile with detail :", err.Error())
@@ -40,28 +42,14 @@ func (h cloudHandler) Upload(c *fiber.Ctx) error {
 		return helper.ResponseError(c, errBadrequest)
 	}
 
-	typeFile := c.FormValue("type", "")
-	quality := c.FormValue("quality", "10 ")
+	if typeFile != "products" {
+		if typeFile != "users" {
+			if typeFile != "merchants" {
+				return helper.ErrInvalidEmail
+			}
+		}
 
-	// if err = os.Mkdir(path+"/"+typeFile, 0777); err != nil {
-	// 	if err == os.ErrExist {
-	// 		log.Println("already exists")
-	// 	} else {
-	// 		log.Println("error when try to create directory", typeFile, "with detail", err.Error())
-	// 		errInternal := fiber.ErrInternalServerError
-	// 		errInternal.Message = err.Error()
-	// 		return errInternal
-	// 	}
-	// }
-
-	// destination, err := os.Create(path + "/" + typeFile + "/" + file.Filename)
-	// if err != nil {
-	// 	errInternal := fiber.ErrInternalServerError
-	// 	errInternal.Message = err.Error()
-	// 	return errInternal
-	// }
-
-	// defer destination.Close()
+	}
 
 	source, err := file.Open()
 	if err != nil {
@@ -97,61 +85,7 @@ func (h cloudHandler) Upload(c *fiber.Ctx) error {
 
 	log.Println("upload success with URL :", uri)
 
-	// if _, err = io.Copy(destination, source); err != nil {
-	// 	errInternal := fiber.ErrInternalServerError
-	// 	errInternal.Message = err.Error()
-	// 	return errInternal
-	// }
-
 	return helper.ResponseSuccess(c, true, "upload file success", http.StatusOK, helper.Payload{
 		Url: uri,
 	}, nil)
 }
-
-// func Download(c *fiber.Ctx) error {
-// 	type request struct {
-// 		Url string `json:"url"`
-// 	}
-
-// 	var req = request{}
-// 	if err := c.BodyParser(&req); err != nil {
-// 		errBadrequest := fiber.ErrBadRequest
-// 		errBadrequest.Message = err.Error()
-// 		return errBadrequest
-// 	}
-
-// 	now := time.Now().Unix()
-// 	destionation, err := os.Create(
-// 		config.GetConfigString("PUBLIC_PATH_DOWNLOAD", "public/downloads") + "/" + fmt.Sprintf("%v", now) + ".jpg",
-// 	)
-
-// 	if err != nil {
-// 		errInternal := fiber.ErrInternalServerError
-// 		errInternal.Message = err.Error()
-// 		return errInternal
-// 	}
-
-// 	defer destionation.Close()
-
-// 	resp, err := http.Get(req.Url)
-
-// 	if err != nil {
-// 		log.Println("error detail :", err.Error())
-// 		b, _ := json.Marshal(resp.Body)
-// 		log.Println("response :", string(b))
-// 		errInternal := fiber.ErrInternalServerError
-// 		errInternal.Message = err.Error()
-// 		return errInternal
-// 	}
-
-// 	_, err = io.Copy(destionation, resp.Body)
-// 	if err != nil {
-// 		errInternal := fiber.ErrInternalServerError
-// 		errInternal.Message = err.Error()
-// 		return errInternal
-// 	}
-
-// 	return c.Status(http.StatusOK).JSON(fiber.Map{
-// 		"message": "file download successfully",
-// 	})
-// }
