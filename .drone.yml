@@ -12,7 +12,7 @@ steps:
     image: golang
     # environment yang dibutuhkan sama aplikasi golang
     environment:
-      DB_HOST: 103.193.176.215
+      DB_HOST: http://103.193.176.215
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASS: 74712331
