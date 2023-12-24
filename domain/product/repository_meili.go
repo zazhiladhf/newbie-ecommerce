@@ -18,7 +18,6 @@ func NewMeiliRepository(clent *meilisearch.Client) MeiliRepository {
 	}
 }
 
-// GetAll implements SearchEngineInterface.
 func (m MeiliRepository) GetAll(ctx context.Context) (productList []Product, err error) {
 	resp, err := m.client.Index("products").Search("book", &meilisearch.SearchRequest{
 		Facets: []string{"category"},

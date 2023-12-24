@@ -29,7 +29,7 @@ func init() {
 		panic(err)
 	}
 
-	// set connect meili
+	// set connect meilisearch
 	client, err := meili.ConnectMeilisearch("http://103.193.176.215:7700", "ThisIsMasterKey")
 	if err != nil {
 		panic(err)
