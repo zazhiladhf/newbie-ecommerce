@@ -12,11 +12,11 @@ steps:
     image: golang
     # environment yang dibutuhkan sama aplikasi golang
     environment:
-      DB_HOST: db
+      DB_HOST: localhost
       DB_PORT: 5432
-      DB_USER: noobee
-      DB_PASS: noobee
-      DB_NAME: noobee
+      DB_USER: postgres
+      DB_PASS: 74712331
+      DB_NAME: newbie-ecommerce
     # ini akan menunjukkan bahwa step ini akan jalan
     # setelah services/step yang namanya "db" selesai/sedang berjalan
     depends_on:
@@ -35,9 +35,9 @@ services:
     image: postgres
     # setup environment variable
     environment:
-      POSTGRES_PASSWORD: noobee
-      POSTGRES_USER: noobee
-      POSTGRES_DB: noobee
+      POSTGRES_PASSWORD: 74712331
+      POSTGRES_USER: postgres
+      POSTGRES_DB: newbie-ecommerce
 
 # trigger drone saat ada event push pada branch master
 # kita bisa setup trigger dengan branch, atau event, atau branch dan event
