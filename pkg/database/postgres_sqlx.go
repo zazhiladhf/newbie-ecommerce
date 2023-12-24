@@ -52,6 +52,18 @@ func Migrate(db *sqlx.DB) (err error) {
 			UNIQUE (name)
 		);
 
+		CREATE TABLE IF NOT EXISTS merchants (
+			id SERIAL PRIMARY KEY,
+			auth_id int NOT NULL,
+			name VARCHAR(100) NOT NULL,
+			phone_number VARCHAR(20) NOT NULL,
+			address VARCHAR(100) NOT NULL,
+			image_url VARCHAR(100) NOT NULL,
+			city varchar(100) NOT NULL,
+			FOREIGN KEY ("auth_id") REFERENCES "auths" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+			UNIQUE (auth_id)
+		);
+
 		CREATE TABLE IF NOT EXISTS products (
 			id SERIAL PRIMARY KEY,
 			name varchar(100) NOT NULL,
@@ -68,6 +80,7 @@ func Migrate(db *sqlx.DB) (err error) {
 			FOREIGN KEY ("merchant_id") REFERENCES "merchants" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 		);
 
+		CREATE TYPE genders AS ENUM ('male', 'female');
 
 		CREATE TABLE IF NOT EXISTS users (
 			id SERIAL PRIMARY KEY,
@@ -82,22 +95,8 @@ func Migrate(db *sqlx.DB) (err error) {
 			UNIQUE (auth_id)
 		);
 
-		CREATE TABLE IF NOT EXISTS merchants (
-			id SERIAL PRIMARY KEY,
-			auth_id int NOT NULL,
-			name VARCHAR(100) NOT NULL,
-			phone_number VARCHAR(20) NOT NULL,
-			address VARCHAR(100) NOT NULL,
-			image_url VARCHAR(100) NOT NULL,
-			city varchar(100) NOT NULL,
-			FOREIGN KEY ("auth_id") REFERENCES "auths" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-			UNIQUE (auth_id)
-		);
-
 	`
 	_, err = db.Exec(query)
 
 	return
 }
-
-// CREATE TYPE gender AS ENUM ('male', 'female');
