@@ -23,11 +23,13 @@ func init() {
 		Name:     "newbie-ecommerce",
 	}
 
+	// set connect db postgres
 	db, err := database.ConnectPostgresSqlx(cfg)
 	if err != nil {
 		panic(err)
 	}
 
+	// set connect meili
 	client, err := meili.ConnectMeilisearch("http://103.193.176.215:7700", "ThisIsMasterKey")
 	if err != nil {
 		panic(err)
