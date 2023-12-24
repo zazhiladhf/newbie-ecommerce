@@ -19,6 +19,46 @@ func NewPostgresSQLXRepository(db *sqlx.DB) PostgresSQLXRepository {
 	}
 }
 
+// CheckoutProduct implements ProductRepository.
+func (r PostgresSQLXRepository) CheckoutProduct(ctx context.Context, id, quantity int) (tx *sqlx.Tx, err error) {
+	tx, err = r.execTx(ctx, func(rt *txPostgresSQLXRepository) (err error) {
+		product, err := rt.GetProductByIdForUpdate(ctx, id)
+		if err != nil {
+			return
+		}
+
+		product.Stock = product.Stock - quantity
+
+		err = rt.UpdateProductStok(ctx, product)
+		if err != nil {
+			return
+		}
+
+		return
+	})
+
+	return tx, err
+}
+
+func (r PostgresSQLXRepository) execTx(ctx context.Context, fn func(*txPostgresSQLXRepository) error) (*sqlx.Tx, error) {
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return nil, err
+	}
+
+	queries := NewTXPostgresSQLXRepository(tx)
+	err = fn(queries)
+
+	if err != nil {
+		if rbErr := tx.Rollback(); rbErr != nil {
+			return nil, rbErr
+		}
+		return nil, err
+	}
+
+	return tx, nil
+}
+
 func (r PostgresSQLXRepository) InsertProduct(ctx context.Context, product Product) (id int, err error) {
 	query := `
 		INSERT INTO products (

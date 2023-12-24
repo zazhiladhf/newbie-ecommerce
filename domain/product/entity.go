@@ -7,21 +7,21 @@ import (
 )
 
 type Product struct {
-	Id           int    `db:"id" json:"id"`
-	Name         string `db:"name"`
-	Description  string `db:"description"`
-	Stock        int    `db:"stock"`
-	Price        int    `db:"price"`
-	Category     string `db:"category"`
-	CategoryId   int    `db:"category_id"`
-	ImageURL     string `db:"image_url"`
-	MerchantId   int    `db:"merchant_id"`
-	Sku          string `db:"sku"`
-	CreatedAt    string `db:"created_at"`
-	UpdatedAt    string `db:"updated_at"`
-	MerchantName string `db:"merchant_name"`
-	MerchantCity string `db:"merchant_city"`
-	TotalData    int    `db:"total_data"`
+	Id           int    `db:"id" bson:"id"`
+	Name         string `db:"name" bson:"name"`
+	Description  string `db:"description" bson:"description"`
+	Stock        int    `db:"stock" bson:"stock"`
+	Price        int    `db:"price" bson:"price"`
+	Category     string `db:"category" bson:"category"`
+	CategoryId   int    `db:"category_id" bson:"category_id"`
+	ImageURL     string `db:"image_url" bson:"image_url"`
+	MerchantId   int    `db:"merchant_id" bson:"merchant_id"`
+	Sku          string `db:"sku" bson:"sku"`
+	CreatedAt    string `db:"created_at" bson:"created_at"`
+	UpdatedAt    string `db:"updated_at" bson:"updated_at"`
+	MerchantName string `db:"merchant_name" bson:"merchant_name"`
+	MerchantCity string `db:"merchant_city" bson:"merchant_city"`
+	TotalData    int    `db:"total_data" bson:"total_data"`
 }
 
 func NewProduct() Product {

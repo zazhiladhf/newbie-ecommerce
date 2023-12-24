@@ -25,7 +25,7 @@ type User struct {
 	Address     string `db:"address"`
 	ImageUrl    string `db:"image_url"`
 	AuthId      int    `db:"auth_id"`
-	Auth        auth.Auth
+	auth.Auth
 }
 
 func NewUser() User {

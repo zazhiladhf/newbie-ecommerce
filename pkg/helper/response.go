@@ -94,11 +94,12 @@ func ApiResponse(c *fiber.Ctx, httpCode int, success bool, message string, err s
 
 func ResponseSuccess(c *fiber.Ctx, success bool, message string, httpCode int, payload interface{}, pagination interface{}) error {
 	resp := response{
-		Success:   success,
-		Message:   message,
-		Error:     "",
-		ErrorCode: "",
-		Payload:   payload,
+		Success:    success,
+		Message:    message,
+		Error:      "",
+		ErrorCode:  "",
+		Payload:    payload,
+		Pagination: pagination,
 	}
 	c = c.Status(httpCode)
 	return c.JSON(resp)
@@ -198,18 +199,18 @@ func ResponseError(c *fiber.Ctx, err error) error {
 }
 
 type Pagination struct {
-	Query string `json:"query"`
-	Limit int    `json:"limit"`
-	Page  int    `json:"page"`
-	Total int    `json:"total"`
+	Query     string `json:"query,omitempty"`
+	Limit     int    `json:"limit"`
+	Page      int    `json:"page"`
+	TotalPage int    `json:"total_page"`
 }
 
 func NewPaginationResponse(queryParam string, limit, page, totalData int) Pagination {
 	return Pagination{
-		Query: queryParam,
-		Limit: limit,
-		Page:  page,
-		Total: CountTotalPage(totalData, limit),
+		Query:     queryParam,
+		Limit:     limit,
+		Page:      page,
+		TotalPage: CountTotalPage(totalData, limit),
 	}
 }
 

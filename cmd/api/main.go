@@ -10,6 +10,7 @@ import (
 	"github.com/zazhiladhf/newbie-ecommerce/domain/category"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/files"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/merchant"
+	"github.com/zazhiladhf/newbie-ecommerce/domain/order"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/product"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/search"
 	"github.com/zazhiladhf/newbie-ecommerce/domain/user"
@@ -17,6 +18,7 @@ import (
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/images"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/meili"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/middleware"
+	paymentgateway "github.com/zazhiladhf/newbie-ecommerce/pkg/payment-gateway"
 )
 
 func main() {
@@ -63,6 +65,16 @@ func main() {
 		panic(err)
 	}
 
+	// setup payment gateway
+	xenditClient := paymentgateway.NewXendit(config.Cfg.Payment.SecretKey)
+	xenditClient.SetConfig(config.Cfg.Payment)
+
+	// setup mongodb
+	mongoDB, err := database.ConnectMongo(config.Cfg.MongoDB)
+	if err != nil {
+		log.Println("error connect mongoDB", err)
+	}
+
 	// migration db
 	log.Println("running db migration")
 	err = database.Migrate(dbSqlx)
@@ -78,6 +90,7 @@ func main() {
 	files.RegisterRoutesFile(router, cloudClient, cloudName, apiKey, apiSecret)
 	user.RegisterRoutesUser(router, dbSqlx)
 	merchant.RegisterRoutesMerchant(router, dbSqlx)
+	order.RegisterRouteOrder(router, dbSqlx, mongoDB, xenditClient)
 	search.RegisterRoutesMeili(router, client)
 
 	// listen app
