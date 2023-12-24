@@ -16,7 +16,7 @@ redis:
   lifeTime: 24
 
 meili:
-  host: "http://localhost:7700"
+  host: "http://103.193.176.215:7700"
   key: "ThisIsMasterKey"
 
 jwt:
