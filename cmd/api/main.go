@@ -19,12 +19,11 @@ import (
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/meili"
 	"github.com/zazhiladhf/newbie-ecommerce/pkg/middleware"
 	paymentgateway "github.com/zazhiladhf/newbie-ecommerce/pkg/payment-gateway"
-	"github.com/zazhiladhf/newbie-ecommerce/pkg/search"
 )
 
 func main() {
 	// setup config
-	err := config.LoadConfig("../../config/config.yaml")
+	err := config.LoadConfig("./config/config.yaml")
 	if err != nil {
 		log.Println("error when try to LoadConfig with error :", err.Error())
 	}
